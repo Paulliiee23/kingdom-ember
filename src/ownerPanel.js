@@ -22,15 +22,11 @@ export function installOwnerPanel({state,save,redraw,refresh,notify}) {
   const finishJobs=()=>{for(const j of state.jobs||[]){if(j.kind==='train'&&j.unit)state.troops[j.unit]=(state.troops[j.unit]||0)+(j.count||0);else if(j.kind==='research'&&j.key in state.research)state.research[j.key]=(state.research[j.key]||0)+1;else if(j.kind==='upgrade'){const b=state.buildings.find(b=>b.x===j.x&&b.z===j.z);if(b)b.level=Math.min(limits.building,(b.level||1)+1);}}state.jobs=[];};
   const action=(fn,message)=>{snapshot();fn();complete(message);};
   const title=document.createElement('h2');title.textContent='♛ Kingdom Ember 0.9.4 — Owner';title.style.margin='0 0 8px';overlay.append(title);
-  const note=document.createElement('p');note.textContent='OFFLINE TEST ONLY. The first owner action saves a restore point. Hero equipment and player sponsorship are not yet implemented.';overlay.append(note);
+  const note=document.createElement('p');note.textContent='OFFLINE TEST ONLY. The first owner action saves a restore point. Finish buttons only complete active jobs; they do not grant levels or bypass normal build/research costs.';overlay.append(note);
   button('✕ Close',()=>overlay.style.display='none');
   button('💎 Refill Resources',()=>action(maxResources,'Treasury refilled'));
-  button('🏰 Max Buildings (Lv 30)',()=>action(()=>{maxBuildings();state.jobs=state.jobs.filter(j=>j.kind!=='upgrade');},'Buildings maxed to level 30'));
-  button('📜 Max Research',()=>action(()=>{maxResearch();state.jobs=state.jobs.filter(j=>j.kind!=='research');},'Research maxed'));
-  button('⚔️ Max Troops',()=>action(()=>{maxTroops();state.jobs=state.jobs.filter(j=>j.kind!=='train');},'Troops maxed'));
-  button('⭐ Max Kingdom Level',()=>action(()=>{state.level=limits.kingdom;state.xp=0;},'Kingdom level maxed'));
-  button('⏱ Complete Build / Research / Train',()=>action(finishJobs,'Queued jobs completed'));
-  button('🔷 Unified Citadel +1',()=>action(()=>{const castle=state.buildings.find(b=>b.type==='castle');if(!castle)throw Error('No castle');castle.level=Math.max(castle.level,30);state.castleUnifiedLevel=(Number(state.castleUnifiedLevel)||0)+1;},'Unified Citadel stage increased'));
-  button('👑 MAX EVERYTHING',()=>{if(!confirm('Max all current systems? Your original save will be backed up on first use.'))return;action(()=>{maxBuildings();maxResearch();maxTroops();maxResources();state.level=limits.kingdom;state.xp=0;state.jobs=[];},'All available systems maxed');});
+  button('🏗️ Finish Build / Upgrade',()=>action(()=>{const jobs=(state.jobs||[]).filter(j=>j.kind==='upgrade');for(const j of jobs){const b=state.buildings.find(b=>b.x===j.x&&b.z===j.z);if(b)b.level=Math.min(limits.building,(b.level||1)+1)}state.jobs=state.jobs.filter(j=>j.kind!=='upgrade');},'Construction timers completed — normal progression preserved'));
+  button('📜 Finish Research',()=>action(()=>{const jobs=(state.jobs||[]).filter(j=>j.kind==='research');for(const j of jobs)if(Object.prototype.hasOwnProperty.call(state.research,j.key))state.research[j.key]=(state.research[j.key]||0)+1;state.jobs=state.jobs.filter(j=>j.kind!=='research');},'Research timers completed — normal progression preserved'));
+  button('⚔️ Finish Training',()=>action(()=>{const jobs=(state.jobs||[]).filter(j=>j.kind==='train');for(const j of jobs)if(j.unit)state.troops[j.unit]=(state.troops[j.unit]||0)+(j.count||0);state.jobs=state.jobs.filter(j=>j.kind!=='train');},'Training completed'));
   button('↶ Restore original owner backup',()=>{const raw=localStorage.getItem(backupKey);if(!raw)return notify('No owner backup exists');if(!confirm('Restore original backup? Current progress will be overwritten.'))return;const restored=JSON.parse(raw);Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,restored);complete('Original backup restored');});
 }
