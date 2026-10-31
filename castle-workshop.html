@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kingdom Ember — Castle Prototype</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101b27;color:#f7e8c5;font:15px system-ui,sans-serif;overflow:hidden}canvas{display:block}
+header{position:absolute;z-index:2;top:16px;left:16px;padding:16px 20px;border:1px solid #977b4c;border-radius:12px;background:#152635e8;max-width:350px;box-shadow:0 8px 32px #0007}
+h1{font-size:21px;margin:0 0 5px;color:#f4c879}p{margin:5px 0;color:#d6d9da;line-height:1.45}.controls{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+button{border:1px solid #bb9251;border-radius:7px;background:#355268;color:#fff;padding:9px 14px;font-weight:700;cursor:pointer}button:hover{background:#49718a}strong{font-size:20px;min-width:84px;text-align:center}
+footer{position:absolute;bottom:16px;left:16px;z-index:2;background:#152635d9;border-radius:9px;padding:9px 12px;color:#ddd;font-size:13px}
+@media(max-width:550px){header{top:8px;left:8px;right:8px;max-width:none;padding:11px}h1{font-size:17px}footer{font-size:11px;bottom:8px;left:8px;right:8px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"}}</script></head>
+<body><header><h1>🏰 Kingdom Ember · Castle Workshop</h1><p>Original Level 1 timber-and-stone fortress. Rotate and zoom to inspect its construction.</p><div class="controls"><button id="down" aria-label="Previous level">−</button><strong id="level">Level 1</strong><button id="up" aria-label="Next level">+</button><button id="reset">Reset view</button></div><p id="description">A humble frontier stronghold.</p></header><footer>Drag to rotate · Scroll or pinch to zoom · Levels 1–8</footer>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color('#142b37');scene.fog=new THREE.Fog('#142b37',22,52);
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.1,100);camera.position.set(14,12,17);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1.7,0);controls.minDistance=9;controls.maxDistance=34;controls.maxPolarAngle=Math.PI*.48;
+scene.add(new THREE.HemisphereLight(0xb9e3ff,0x584b30,2.1));const sun=new THREE.DirectionalLight(0xffdfad,3);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-13;sun.shadow.camera.right=13;sun.shadow.camera.top=13;sun.shadow.camera.bottom=-13;scene.add(sun);
+const mat=(c,r=1)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const stone=mat('#b7afa0'),stoneLight=mat('#d6c9b5'),stoneDark=mat('#716c66'),wood=mat('#8d572e'),woodLight=mat('#b77b43'),woodDark=mat('#50371f'),roof=mat('#a76c36'),metal=mat('#a49b89',.55),grass=mat('#62814c'),dirt=mat('#827452'),blue=mat('#386a9b'),red=mat('#a83230');
+const ground=new THREE.Mesh(new THREE.CylinderGeometry(10,10,.55,8),dirt);ground.position.y=-.45;ground.receiveShadow=true;scene.add(ground);
+const lawn=new THREE.Mesh(new THREE.CylinderGeometry(9.8,9.8,.1,8),grass);lawn.position.y=-.14;lawn.receiveShadow=true;scene.add(lawn);
+let castle=new THREE.Group();scene.add(castle);
+function cube(parent,w,h,d,x,y,z,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function cone(parent,r,h,x,y,z,m,n=4,rotation=Math.PI/4){const o=new THREE.Mesh(new THREE.ConeGeometry(r,h,n),m);o.position.set(x,y,z);o.rotation.y=rotation;o.castShadow=true;parent.add(o);return o}
+function banner(parent,x,y,z){const cloth=cube(parent,.38,.82,.055,x,y,z,blue);cube(parent,.46,.08,.12,x,y+.44,z,metal);cube(parent,.12,.34,.07,x,y,z+.04,stoneLight)}
+function tree(parent,x,z,s=1){const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.12*s,.17*s,.7*s,7),woodDark);trunk.position.set(x,.35*s,z);trunk.castShadow=true;parent.add(trunk);cone(parent,.55*s,1.25*s,x,1.13*s,z,mat('#3c754a'),7,0)}
+function torch(parent,x,y,z){cube(parent,.12,.48,.12,x,y,z,woodDark);const fire=new THREE.Mesh(new THREE.ConeGeometry(.18,.4,6),mat('#ffb447',.2));fire.position.set(x,y+.36,z);parent.add(fire);const light=new THREE.PointLight(0xffa342,1.1,3);light.position.set(x,y+.3,z);parent.add(light)}
+function make(level){
+castle.clear();
+const rise=(level-1)*.09,wallH=1.55+rise,keepH=3.15+(level-1)*.17;
+cube(castle,8.4,.35,8.4,0,.03,0,stoneDark);
+for(const side of [-1,1]){
+ cube(castle,8,wallH,.62,0,wallH/2,side*3.65,wood);
+ cube(castle,.62,wallH,8,side*3.65,wallH/2,0,wood);
+ for(let i=-3;i<=3;i+=1.2){cube(castle,.75,.33,.79,i,wallH+.08,side*3.65,stoneLight);cube(castle,.79,.33,.75,side*3.65,wallH+.08,i,stoneLight)}
+ for(let i=-2.6;i<=2.6;i+=1.3){cube(castle,.13,wallH-.25,.68,i,(wallH-.25)/2,side*3.65,woodLight);cube(castle,.68,wallH-.25,.13,side*3.65,(wallH-.25)/2,i,woodLight)}
+}
+for(const x of [-3.65,3.65])for(const z of [-3.65,3.65]){
+ cube(castle,1.4,2.3+rise,1.4,x,1.15+rise/2,z,wood);
+ cube(castle,1.65,.32,1.65,x,2.43+rise,z,stoneLight);
+ for(const dx of [-.64,.64])for(const dz of [-.64,.64])cube(castle,.25,.35,.25,x+dx,2.73+rise,z+dz,metal);
+ cube(castle,1.1,.1,1.1,x,2.64+rise,z,woodLight);
+}
+cube(castle,2.6,keepH,2.5,0,keepH/2,-.55,stone);
+for(const x of [-1.35,1.35])for(const z of [-1.28,1.28])cube(castle,.3,keepH+.2,.3,x,(keepH+.2)/2,z-.55,stoneLight);
+cube(castle,2.85,.35,2.75,0,keepH+.08,-.55,stoneLight);
+cone(castle,1.93,1.55,0,keepH+1,-.55,roof);
+cube(castle,.1,.8,.1,0,keepH+2.02,-.55,woodDark);
+const flag=cube(castle,.7,.36,.045,.38,keepH+2.22,-.55,red);flag.rotation.z=-.12;
+for(const x of [-.65,.65]){cube(castle,.34,.6,.06,x,keepH*.68,.75,woodDark);cube(castle,.16,.5,.07,x,keepH*.68,.79,metal)}
+// Forward-facing gatehouse and timber gate
+cube(castle,2.5,2.2+rise,1.05,0,1.1+rise/2,3.75,stone);
+cube(castle,1.45,1.65,.13,0,.82,4.34,woodDark);
+for(let x=-.55;x<=.55;x+=.27)cube(castle,.055,1.5,.15,x,.82,4.43,woodLight);
+cube(castle,2.8,.34,1.35,0,2.35+rise,3.75,stoneLight);
+for(const x of [-1.15,-.38,.38,1.15])cube(castle,.48,.4,.65,x,2.7+rise,4,stoneLight);
+banner(castle,-1.06,1.25,4.43);banner(castle,1.06,1.25,4.43);
+cube(castle,1.2,.6,1.15,-1.9,.3,-1.8,woodLight);cone(castle,1,.8,-1.9,1.05,-1.8,roof);
+cube(castle,1.4,.95,1.1,1.9,.47,-1.7,woodLight);cone(castle,1.1,.8,1.9,1.35,-1.7,roof);
+for(const [x,z] of [[-2.5,.8],[2.6,1.2],[-2.7,-2.6],[2.8,-2.8]])tree(castle,x,z,.65);
+for(const x of [-1.45,1.45])torch(castle,x,1.35,4.43);
+if(level>=3){for(const x of [-2.5,2.5])banner(castle,x,1.35,4.05)}
+if(level>=5){for(const x of [-3.65,3.65]){cube(castle,.45,.5,.45,x,3.05+rise,3.65,stone);cone(castle,.45,.75,x,3.72+rise,3.65,roof)}}
+if(level>=7){cube(castle,1.2,.6,1.1,2.2,.3,.7,stone);cube(castle,1.6,.1,1.45,2.2,.68,.7,woodLight)}
+document.getElementById('level').textContent='Level '+level;
+document.getElementById('description').textContent=level===1?'A humble frontier stronghold.':level<5?'Timber walls and a growing garrison.':level<8?'Stronger watchtowers and reinforced defenses.':'Ready to evolve into the Level 9 fortress.';
+}
+let level=1;document.getElementById('down').onclick=()=>make(level=Math.max(1,level-1));document.getElementById('up').onclick=()=>make(level=Math.min(8,level+1));document.getElementById('reset').onclick=()=>{camera.position.set(14,12,17);controls.target.set(0,1.7,0);controls.update()};
+make(level);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+</script></body></html>
