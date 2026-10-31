@@ -192,47 +192,74 @@ function emberFortress(parent,level,unified=0,size=1){
   }
  }
  if(advanced){
-  // Levels 25–30: six distinct purple-and-silver fortress configurations.
-  const emberGlow=new THREE.MeshStandardMaterial({color:0xc88aff,emissive:0x5823a2,emissiveIntensity:.65,roughness:.4});
-  for(const x of [-1,1]){
-   cube(f,.13,.55,.13,metal,x,2.0,1);
-   cone(f,.16,.38,accent,x,2.45,1);
-   cube(f,.12,.34,.13,metal,x,1.68,-.94);
+  // Amethyst Citadel: hand-directed procedural geometry based on the approved 25–30 concept.
+  const crystal=new THREE.MeshStandardMaterial({color:0xc874ff,emissive:0x7925c4,emissiveIntensity:.85,metalness:.12,roughness:.17});
+  const royalPurple=new THREE.MeshStandardMaterial({color:0x4d247f,roughness:.76});
+  const royalGold=new THREE.MeshStandardMaterial({color:0xe4bf78,metalness:.6,roughness:.33});
+  const light=new THREE.MeshStandardMaterial({color:0xf7b4ff,emissive:0x9b4ecb,emissiveIntensity:.65,roughness:.26});
+  // Base tier: pale-stone columns, violet banners, silver/gold finials and a grand entrance.
+  for(const x of [-1,1])for(const z of [-1,1]){
+   cube(f,.13,.61,.13,royalGold,x,towerH+.85,z);
+   cone(f,.15,.36,royalGold,x,towerH+1.28,z,6);
+   cube(f,.27,.55,.06,royalPurple,x,.99,z+Math.sign(z)*.38);
+   cube(f,.07,.31,.075,royalGold,x,1.06,z+Math.sign(z)*.43);
   }
-  cube(f,.55,.09,.55,metal,0,keepH+.68,-.23);
-  // 25: new imperial parapets and silver central spire.
-  cone(f,.24,.54,metal,0,keepH+1.06,-.23,6);
-  for(const x of [-.72,.72])cube(f,.21,.32,.21,metal,x,1.58,1.03);
-  // 26: paired flame braziers on the forward battlements.
-  if(progress>=1)for(const x of [-.72,.72]){
-   cube(f,.22,.17,.22,metal,x,1.84,1.03);
-   cone(f,.16,.35,emberGlow,x,2.13,1.03,6);
+  for(const x of [-.67,.67]){
+   cube(f,.2,1.02,.2,stone,x,.92,1.11);
+   cube(f,.25,.17,.25,royalGold,x,1.51,1.11);
   }
-  // 27: raised fortified gate arch and silver lintel.
-  if(progress>=2){
-   cube(f,.99,.22,.42,stone,0,1.53,1.12);
-   cube(f,.86,.12,.46,metal,0,1.68,1.12);
-  }
-  // 28: two high flanking turrets.
-  if(progress>=3)for(const x of [-.76,.76]){
-   cube(f,.28,.7,.28,stone,x,1.91,-.62);
-   cone(f,.3,.62,roofMat,x,2.57,-.62);
-   cone(f,.1,.22,metal,x,2.97,-.62,6);
-  }
-  // 29: reinforced inner keep, illuminated royal windows.
-  if(progress>=4){
-   for(const x of [-.4,0,.4])cube(f,.18,.34,.07,glass,x,1.86,.36);
-   for(const z of [-.7,.7])cube(f,.2,.49,.2,metal,0,1.92,z);
-  }
-  // 30: crown spires and ceremonial flags complete the citadel.
-  if(progress>=5){
-   for(const x of [-1,1])for(const z of [-1,1]){
-    cube(f,.09,.38,.09,metal,x,towerH+1.1,z);
-    cone(f,.15,.36,emberGlow,x,towerH+1.44,z,6);
+  cube(f,.92,.2,.38,royalGold,0,1.51,1.16);
+  cone(f,.23,.54,roofMat,0,keepH+.99,-.23,6);
+  cone(f,.11,.28,royalGold,0,keepH+1.38,-.23,6);
+  // Level 26 — reinforced gateway and glowing amethyst braziers.
+  if(progress>=1){
+   cube(f,1.04,.24,.43,stone,0,1.7,1.14);
+   for(const x of [-.76,.76]){
+    cube(f,.24,.17,.24,royalGold,x,1.86,1.12);
+    cone(f,.17,.47,crystal,x,2.17,1.12,6);
    }
-   for(const x of [-.66,.66]){
-    cube(f,.08,.53,.08,metal,x,keepH+.81,-.23);
-    cube(f,.27,.22,.05,roofMat,x+.14,keepH+1.02,-.23);
+  }
+  // Level 27 — taller keep and amethyst spires overlooking the courtyard.
+  if(progress>=2){
+   cube(f,.78,.55,.76,stone,0,keepH+.65,-.23);
+   cube(f,.92,.15,.88,royalGold,0,keepH+.99,-.23);
+   cone(f,.48,.85,roofMat,0,keepH+1.47,-.23);
+   for(const x of [-.67,.67])cone(f,.18,.54,crystal,x,2.24,.55,6);
+  }
+  // Level 28 — two new fortified towers, high purple roofs and crystal pinnacles.
+  if(progress>=3){
+   for(const x of [-.76,.76]){
+    cube(f,.36,.95,.35,stone,x,1.9,-.65);
+    cube(f,.43,.17,.42,royalGold,x,2.46,-.65);
+    cone(f,.34,.75,roofMat,x,2.89,-.65);
+    cone(f,.14,.43,crystal,x,3.46,-.65,6);
+   }
+   for(const x of [-.86,.86])cone(f,.18,.55,crystal,x,1.94,.14,6);
+  }
+  // Level 29 — illuminated windows, ceremonial banners and royal balconies.
+  if(progress>=4){
+   for(const x of [-.35,0,.35]){
+    cube(f,.16,.42,.07,light,x,1.98,.37);
+    cube(f,.19,.08,.1,royalGold,x,2.23,.39);
+   }
+   for(const x of [-.76,.76]){
+    cube(f,.3,.72,.06,royalPurple,x,1.28,1.17);
+    cube(f,.085,.39,.07,royalGold,x,1.37,1.23);
+   }
+   cube(f,.9,.14,.48,royalGold,0,2.24,.4);
+  }
+  // Level 30 — a dominant throne spire and crystal-crowned outer towers.
+  if(progress>=5){
+   cube(f,.69,.77,.66,stone,0,keepH+1.45,-.23);
+   cube(f,.84,.17,.81,royalGold,0,keepH+1.88,-.23);
+   cone(f,.47,1.07,roofMat,0,keepH+2.45,-.23);
+   cone(f,.25,.89,crystal,0,keepH+3.3,-.23,6);
+   for(const x of [-1,1])for(const z of [-1,1]){
+    cone(f,.21,.64,crystal,x,towerH+1.6,z,6);
+   }
+   for(const x of [-.78,.78]){
+    cube(f,.08,.56,.08,royalGold,x,2.26,.85);
+    cube(f,.28,.2,.055,royalPurple,x+.13,2.45,.85);
    }
   }
  }
