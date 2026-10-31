@@ -26,6 +26,23 @@ Hero deliverables: front/back turnaround, face portrait, rigged game model, idle
 
 Tier silhouettes should be recognisable without colour; improve armour geometry, shields, mounts and machine frames. Faction colour belongs to banners, cloth and heraldry, not skin or armour materials.
 
+## Locked fantasy cavalry progression
+Cavalry direction: **fantasy progression** (confirmed). These are original Kingdom Ember designs, not adaptations of existing game characters.
+
+| Tier | Unit | Mount | Visual identity | Intended role |
+|---|---|---|---|---|
+| I | Frontier Rider | Horse | Leather armour, small shield, spear, violet pennant | Fast entry-level cavalry |
+| II | Ironmane Lancer | Armoured warhorse | Bronze barding, long lance, violet saddlecloth | Reliable charge unit |
+| III | Thornhorn Cavalier | Giant antlered Thornhorn | Silver armour, forest motifs, reinforced saddle | Heavy woodland cavalry |
+| IV | Ashfang Ravager | Obsidian-plated Ashfang beast | Dark volcanic plates, glowing amber markings | Aggressive assault cavalry |
+| V | Embercrest Sovereign | Original lion-drake hybrid | Ivory-gold armour, crystalline mane, ember glow | Elite mythical cavalry |
+
+### Barracks presentation contract
+Four classes: Infantry, Ranged, Cavalry, Siege. Five tiers each. Show class and tier filters, unit name, owned/training counts, stats, unlock requirements, training cost and duration. On selection, reserve space for an animated rotatable 3D model (use original placeholder geometry until finished models exist). Keep a persistent visible training queue and timer, including on mobile. No silent automatic conversion of existing units: any promotion/retraining requires explicit rules and confirmation. Existing troop saves and class keys must remain compatible.
+
+### Cavalry asset requirements
+Each tier needs an original mount and rider silhouette, shared attachment points for saddle/rider/weapon, walk/run/charge/idle/hit animations, simple LOD meshes, and atlas-friendly materials. The Tier V lion-drake must not resemble a copyrighted game mount. Prioritize lightweight Three.js-compatible glTF/GLB exports.
+
 ## Castle progression
 Levels 1–5: Frontier Keep (timber palisade, single tower).
 Levels 6–15: Stone Citadel (masonry walls, gatehouse, watchtowers).
