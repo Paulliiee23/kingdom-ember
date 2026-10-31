@@ -75,7 +75,7 @@ function emberDetails(g,b){const level=b.level;const castle=b.type==='castle';
 // Castle visual stages are independent of gameplay upgrades and never modify saves.
 function emberCastleStage(level,unified=0){
  if(unified>=1)return {name:'Unified Citadel',primary:0x276caa,roof:0x58c5f5,accent:0x8be8ff,scale:1.32};
- if(level>=25)return {name:'Ember Citadel',primary:0xb15b28,roof:0xee862a,accent:0xffc35b,scale:1.28};
+ if(level>=25)return {name:'Amethyst Citadel',primary:0x65418d,roof:0x8f54c5,accent:0xe4b8ff,scale:1.28};
  if(level>=17)return {name:'Red Stronghold',primary:0x8c3030,roof:0xc52b2e,accent:0xf2b45f,scale:1.22};
  if(level>=9)return {name:'Timber Bastion',primary:0x78502f,roof:0x694024,accent:0xd0a06b,scale:1.13};
  return {name:'Frontier Fort',primary:0x81552f,roof:0x986334,accent:0xcab39b,scale:1};
@@ -93,7 +93,7 @@ function emberFortress(parent,level,unified=0,size=1){
  const accent=new THREE.MeshStandardMaterial({color:stage.accent,roughness:.58,metalness:advanced?.2:.04});
  const stone=new THREE.MeshStandardMaterial({color:royal?0xb8b0a6:0xb7ac9c,roughness:.92});
  const beams=new THREE.MeshStandardMaterial({color:0x49321f,roughness:.94});
- const metal=new THREE.MeshStandardMaterial({color:advanced?0xe4bb75:0x8d8273,roughness:.45,metalness:.45});
+ const metal=new THREE.MeshStandardMaterial({color:advanced?0xd8c5e8:0x8d8273,roughness:.45,metalness:.45});
  const glass=new THREE.MeshStandardMaterial({color:ascended?0x65e7ff:royal?0xffbd6b:0x74b4df,roughness:.22,emissive:ascended?0x136aa2:0x071421,emissiveIntensity:ascended?.6:.15});
  const wallH=(large?1.27:1.02)+(royal?.18:0)+progress*.035;
  const towerH=(large?1.82:1.35)+(royal?.23:0)+progress*.065;
@@ -192,15 +192,15 @@ function emberFortress(parent,level,unified=0,size=1){
   }
  }
  if(advanced){
-  // Levels 25–30: six distinct orange-and-gold fortress configurations.
-  const emberGlow=new THREE.MeshStandardMaterial({color:0xff9b36,emissive:0xa84609,emissiveIntensity:.65,roughness:.4});
+  // Levels 25–30: six distinct purple-and-silver fortress configurations.
+  const emberGlow=new THREE.MeshStandardMaterial({color:0xc88aff,emissive:0x5823a2,emissiveIntensity:.65,roughness:.4});
   for(const x of [-1,1]){
    cube(f,.13,.55,.13,metal,x,2.0,1);
    cone(f,.16,.38,accent,x,2.45,1);
    cube(f,.12,.34,.13,metal,x,1.68,-.94);
   }
   cube(f,.55,.09,.55,metal,0,keepH+.68,-.23);
-  // 25: new imperial parapets and golden central spire.
+  // 25: new imperial parapets and silver central spire.
   cone(f,.24,.54,metal,0,keepH+1.06,-.23,6);
   for(const x of [-.72,.72])cube(f,.21,.32,.21,metal,x,1.58,1.03);
   // 26: paired flame braziers on the forward battlements.
@@ -208,7 +208,7 @@ function emberFortress(parent,level,unified=0,size=1){
    cube(f,.22,.17,.22,metal,x,1.84,1.03);
    cone(f,.16,.35,emberGlow,x,2.13,1.03,6);
   }
-  // 27: raised fortified gate arch and gilded lintel.
+  // 27: raised fortified gate arch and silver lintel.
   if(progress>=2){
    cube(f,.99,.22,.42,stone,0,1.53,1.12);
    cube(f,.86,.12,.46,metal,0,1.68,1.12);
