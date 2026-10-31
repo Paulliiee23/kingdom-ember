@@ -85,7 +85,7 @@ function emberFortress(parent,level,unified=0,size=1){
  const lv=Math.max(1,Math.floor(Number(level)||1));
  const stage=emberCastleStage(lv,unified);
  const tier=unified>=1?4:lv>=25?3:lv>=17?2:lv>=9?1:0;
- const step=unified>=1?Math.max(0,Math.floor(unified)-1):tier===3?0:tier===2?lv-17:tier===1?lv-9:lv-1;
+ const step=unified>=1?Math.max(0,Math.floor(unified)-1):tier===3?Math.min(5,lv-25):tier===2?lv-17:tier===1?lv-9:lv-1;
  const progress=Math.min(step,7),large=tier>=1,royal=tier>=2,advanced=tier>=3,ascended=tier===4;
  const f=new THREE.Group();parent.add(f);f.scale.setScalar(size);
  const wall=new THREE.MeshStandardMaterial({color:stage.primary,roughness:.86});
@@ -192,8 +192,49 @@ function emberFortress(parent,level,unified=0,size=1){
   }
  }
  if(advanced){
-  for(const x of [-1,1]){cube(f,.13,.55,.13,metal,x,2.0,1);cone(f,.16,.38,accent,x,2.45,1)}
+  // Levels 25–30: six distinct orange-and-gold fortress configurations.
+  const emberGlow=new THREE.MeshStandardMaterial({color:0xff9b36,emissive:0xa84609,emissiveIntensity:.65,roughness:.4});
+  for(const x of [-1,1]){
+   cube(f,.13,.55,.13,metal,x,2.0,1);
+   cone(f,.16,.38,accent,x,2.45,1);
+   cube(f,.12,.34,.13,metal,x,1.68,-.94);
+  }
   cube(f,.55,.09,.55,metal,0,keepH+.68,-.23);
+  // 25: new imperial parapets and golden central spire.
+  cone(f,.24,.54,metal,0,keepH+1.06,-.23,6);
+  for(const x of [-.72,.72])cube(f,.21,.32,.21,metal,x,1.58,1.03);
+  // 26: paired flame braziers on the forward battlements.
+  if(progress>=1)for(const x of [-.72,.72]){
+   cube(f,.22,.17,.22,metal,x,1.84,1.03);
+   cone(f,.16,.35,emberGlow,x,2.13,1.03,6);
+  }
+  // 27: raised fortified gate arch and gilded lintel.
+  if(progress>=2){
+   cube(f,.99,.22,.42,stone,0,1.53,1.12);
+   cube(f,.86,.12,.46,metal,0,1.68,1.12);
+  }
+  // 28: two high flanking turrets.
+  if(progress>=3)for(const x of [-.76,.76]){
+   cube(f,.28,.7,.28,stone,x,1.91,-.62);
+   cone(f,.3,.62,roofMat,x,2.57,-.62);
+   cone(f,.1,.22,metal,x,2.97,-.62,6);
+  }
+  // 29: reinforced inner keep, illuminated royal windows.
+  if(progress>=4){
+   for(const x of [-.4,0,.4])cube(f,.18,.34,.07,glass,x,1.86,.36);
+   for(const z of [-.7,.7])cube(f,.2,.49,.2,metal,0,1.92,z);
+  }
+  // 30: crown spires and ceremonial flags complete the citadel.
+  if(progress>=5){
+   for(const x of [-1,1])for(const z of [-1,1]){
+    cube(f,.09,.38,.09,metal,x,towerH+1.1,z);
+    cone(f,.15,.36,emberGlow,x,towerH+1.44,z,6);
+   }
+   for(const x of [-.66,.66]){
+    cube(f,.08,.53,.08,metal,x,keepH+.81,-.23);
+    cube(f,.27,.22,.05,roofMat,x+.14,keepH+1.02,-.23);
+   }
+  }
  }
  if(ascended){
   const crystal=new THREE.MeshStandardMaterial({color:0x6edfff,emissive:0x1b84bd,emissiveIntensity:.8,roughness:.17});
