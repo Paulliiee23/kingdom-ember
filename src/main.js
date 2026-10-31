@@ -76,7 +76,7 @@ function emberDetails(g,b){const level=b.level;const castle=b.type==='castle';
 function emberCastleStage(level,unified=0){
  if(unified>=1)return {name:'Unified Citadel',primary:0x276caa,roof:0x58c5f5,accent:0x8be8ff,scale:1.32};
  if(level>=25)return {name:'Ember Citadel',primary:0xb15b28,roof:0xee862a,accent:0xffc35b,scale:1.28};
- if(level>=17)return {name:'Violet Stronghold',primary:0x59448a,roof:0x8c60bf,accent:0xc6a3f3,scale:1.22};
+ if(level>=17)return {name:'Red Stronghold',primary:0x8c3030,roof:0xc52b2e,accent:0xf2b45f,scale:1.22};
  if(level>=9)return {name:'Timber Bastion',primary:0x78502f,roof:0x694024,accent:0xd0a06b,scale:1.13};
  return {name:'Frontier Fort',primary:0x81552f,roof:0x986334,accent:0xcab39b,scale:1};
 }
@@ -91,10 +91,10 @@ function emberFortress(parent,level,unified=0,size=1){
  const wall=new THREE.MeshStandardMaterial({color:stage.primary,roughness:.86});
  const roofMat=new THREE.MeshStandardMaterial({color:stage.roof,roughness:.74});
  const accent=new THREE.MeshStandardMaterial({color:stage.accent,roughness:.58,metalness:advanced?.2:.04});
- const stone=new THREE.MeshStandardMaterial({color:royal?0xaca3ae:0xb7ac9c,roughness:.92});
+ const stone=new THREE.MeshStandardMaterial({color:royal?0xb8b0a6:0xb7ac9c,roughness:.92});
  const beams=new THREE.MeshStandardMaterial({color:0x49321f,roughness:.94});
  const metal=new THREE.MeshStandardMaterial({color:advanced?0xe4bb75:0x8d8273,roughness:.45,metalness:.45});
- const glass=new THREE.MeshStandardMaterial({color:ascended?0x65e7ff:royal?0xc4a1f7:0x74b4df,roughness:.22,emissive:ascended?0x136aa2:0x071421,emissiveIntensity:ascended?.6:.15});
+ const glass=new THREE.MeshStandardMaterial({color:ascended?0x65e7ff:royal?0xffbd6b:0x74b4df,roughness:.22,emissive:ascended?0x136aa2:0x071421,emissiveIntensity:ascended?.6:.15});
  const wallH=(large?1.27:1.02)+(royal?.18:0)+progress*.035;
  const towerH=(large?1.82:1.35)+(royal?.23:0)+progress*.065;
  const keepH=(large?2.12:1.56)+(royal?.38:0)+progress*.075;
@@ -130,7 +130,7 @@ function emberFortress(parent,level,unified=0,size=1){
   cube(f,.15,.3,.065,glass,x,1.1,-.23+(large?.58:.46));
   if(progress>=3)cube(f,.15,.3,.065,glass,x,1.65,-.23+(large?.58:.46));
  }
- // Gatehouse, arched-look timber door, rivets and blue guild pennants.
+ // Gatehouse, timber door, rivets and tier-coloured heraldic pennants.
  cube(f,.86,1.05,.34,stone,0,.82,1.07);
  cube(f,.52,.76,.085,beams,0,.64,1.28);
  cube(f,.65,.13,.38,accent,0,1.4,1.08);
@@ -156,6 +156,40 @@ function emberFortress(parent,level,unified=0,size=1){
  if(royal){
   for(const x of [-.62,.62]){cube(f,.29,.62,.29,wall,x,1.7,.56);cone(f,.27,.59,roofMat,x,2.29,.56)}
   cube(f,.34,.38,.35,accent,0,keepH+.7,-.23);
+  // Red Stronghold: gold-capped spires, scarlet banners, illuminated sconces.
+  const banner=new THREE.MeshStandardMaterial({color:0xa51e2c,roughness:.85,side:THREE.DoubleSide});
+  const flame=new THREE.MeshStandardMaterial({color:0xffb342,emissive:0xff7015,emissiveIntensity:.85,roughness:.35});
+  for(const x of [-1,1]){
+   for(const z of [-1,1]){
+    cone(f,.12,.27,accent,x,towerH+1.33,z,4);
+    if(progress>=2){cube(f,.27,.53,.055,banner,x,.98,z+Math.sign(z)*.36);cube(f,.075,.25,.065,accent,x,1.02,z+Math.sign(z)*.4)}
+   }
+  }
+  for(const x of [-.82,.82]){
+   cube(f,.11,.27,.12,metal,x,1.18,1.22);
+   cone(f,.13,.29,flame,x,1.46,1.22,6);
+  }
+  if(progress>=1){
+   for(const x of [-.52,.52])cube(f,.13,.45,.075,banner,x,1.34,1.19);
+  }
+  if(progress>=3){
+   for(const x of [-.78,.78]){
+    cube(f,.2,.52,.21,stone,x,1.58,-.64);
+    cone(f,.22,.58,roofMat,x,2.1,-.64);
+   }
+  }
+  if(progress>=5){
+   for(const z of [-.72,.72]){
+    cube(f,.18,.55,.18,stone,.0,1.67,z);
+    cone(f,.19,.44,roofMat,0,2.16,z);
+   }
+  }
+  if(progress>=7){
+   for(const x of [-.8,.8]){
+    cube(f,.11,.39,.11,metal,x,2.07,0);
+    cone(f,.13,.3,flame,x,2.38,0,6);
+   }
+  }
  }
  if(advanced){
   for(const x of [-1,1]){cube(f,.13,.55,.13,metal,x,2.0,1);cone(f,.16,.38,accent,x,2.45,1)}
