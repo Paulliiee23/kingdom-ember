@@ -81,40 +81,94 @@ function emberCastleStage(level,unified=0){
  return {name:'Frontier Fort',primary:0x81552f,roof:0x986334,accent:0xcab39b,scale:1};
 }
 function emberFortress(parent,level,unified=0,size=1){
- const st=emberCastleStage(level,unified),f=new THREE.Group();parent.add(f);f.scale.setScalar(size);
- const timber=new THREE.MeshStandardMaterial({color:st.primary,roughness:.88});
- const roofing=new THREE.MeshStandardMaterial({color:st.roof,roughness:.77});
- const trim=new THREE.MeshStandardMaterial({color:st.accent,roughness:.68});
- const masonry=new THREE.MeshStandardMaterial({color:0xb2a99b,roughness:.92});
- const dark=new THREE.MeshStandardMaterial({color:0x392a20,roughness:.96});
- const high=level>=9,grand=level>=17,elite=level>=25,mystic=unified>=1;
- const h=(high?1.45:1.08)+(grand?.18:0);
- cube(f,2.36,.14,2.36,masonry,0,.22,0);
+ // All levels have distinct procedural geometry; no asset download or save migration.
+ const lv=Math.max(1,Math.floor(Number(level)||1));
+ const stage=emberCastleStage(lv,unified);
+ const tier=unified>=1?4:lv>=25?3:lv>=17?2:lv>=9?1:0;
+ const step=unified>=1?Math.max(0,Math.floor(unified)-1):tier===3?0:tier===2?lv-17:tier===1?lv-9:lv-1;
+ const progress=Math.min(step,7),large=tier>=1,royal=tier>=2,advanced=tier>=3,ascended=tier===4;
+ const f=new THREE.Group();parent.add(f);f.scale.setScalar(size);
+ const wall=new THREE.MeshStandardMaterial({color:stage.primary,roughness:.86});
+ const roofMat=new THREE.MeshStandardMaterial({color:stage.roof,roughness:.74});
+ const accent=new THREE.MeshStandardMaterial({color:stage.accent,roughness:.58,metalness:advanced?.2:.04});
+ const stone=new THREE.MeshStandardMaterial({color:royal?0xaca3ae:0xb7ac9c,roughness:.92});
+ const beams=new THREE.MeshStandardMaterial({color:0x49321f,roughness:.94});
+ const metal=new THREE.MeshStandardMaterial({color:advanced?0xe4bb75:0x8d8273,roughness:.45,metalness:.45});
+ const glass=new THREE.MeshStandardMaterial({color:ascended?0x65e7ff:royal?0xc4a1f7:0x74b4df,roughness:.22,emissive:ascended?0x136aa2:0x071421,emissiveIntensity:ascended?.6:.15});
+ const wallH=(large?1.27:1.02)+(royal?.18:0)+progress*.035;
+ const towerH=(large?1.82:1.35)+(royal?.23:0)+progress*.065;
+ const keepH=(large?2.12:1.56)+(royal?.38:0)+progress*.075;
+ // Foundation, courtyard and perimeter. All dimensions stay within a city plot.
+ cube(f,2.38,.19,2.38,stone,0,.18,0);
+ cube(f,1.96,.045,1.96,beams,0,.29,0);
  for(const side of [-1,1]){
-  cube(f,2.18,h,.2,timber,0,.28+h/2,side*1.05);
-  cube(f,.2,h,2.18,timber,side*1.05,.28+h/2,0);
-  for(let i=-.86;i<=.87;i+=.43){
-   cube(f,.25,.2,.27,masonry,i,.36+h,side*1.05);
-   cube(f,.27,.2,.25,masonry,side*1.05,.36+h,i);
+  cube(f,2.17,wallH,.19,wall,0,.3+wallH/2,side*1.07);
+  cube(f,.19,wallH,2.17,wall,side*1.07,.3+wallH/2,0);
+  // Reinforcing braces become denser as each level increases.
+  for(let i=-.83;i<=.84;i+=.42){
+   cube(f,.23,.17,.25,stone,i,.39+wallH,side*1.07);
+   cube(f,.25,.17,.23,stone,side*1.07,.39+wallH,i);
+   if(progress>=2)cube(f,.075,wallH*.7,.22,beams,i,.3+wallH*.45,side*1.07);
   }
  }
+ // Four fortified corner towers.
  for(const x of [-1,1])for(const z of [-1,1]){
-  const th=high?1.9:1.46;
-  cube(f,high?.59:.49,th,high?.59:.49,timber,x,.28+th/2,z);
-  cube(f,.67,.19,.67,masonry,x,.38+th,z);
-  if(high)cone(f,.48,.68,roofing,x,.94+th,z);
+  cube(f,large?.61:.49,towerH,large?.61:.49,wall,x,.3+towerH/2,z);
+  cube(f,.67,.19,.67,stone,x,.39+towerH,z);
+  if(large){
+   cone(f,.47,.65+progress*.018,roofMat,x,.81+towerH,z);
+   if(progress>=3)cube(f,.16,.23,.17,metal,x,.54+towerH,z);
+  }else if(progress>=4)cone(f,.39,.47,roofMat,x,.77+towerH,z);
+  if(progress>=1)cube(f,.12,.27,.055,glass,x,.78+towerH*.43,z+Math.sign(z)*.32);
+  if(royal&&progress>=4)cube(f,.09,.55,.1,accent,x,.55+towerH,z);
  }
- const keepH=high?2.25:1.65;
- cube(f,high?1.12:.88,keepH,high?1.1:.88,masonry,0,.28+keepH/2,-.27);
- cube(f,high?1.3:1.03,.19,high?1.28:1.03,trim,0,.38+keepH,-.27);
- cone(f,high?.91:.74,high?1.02:.73,roofing,0,.54+keepH,-.27);
- cube(f,.85,1.07,.32,masonry,0,.78,1.06);
- cube(f,.49,.78,.09,dark,0,.62,1.24);
- for(const x of [-.28,.28])cube(f,.08,.78,.1,trim,x,.62,1.29);
- if(high){for(const x of [-.63,.63])cube(f,.13,.7,.14,trim,x,1.25,-.86)}
- if(grand){for(const x of [-.62,.62]){cube(f,.3,.65,.3,timber,x,1.6,.6);cone(f,.29,.58,roofing,x,2.2,.6)}}
- if(elite){for(const x of [-1,1])cube(f,.16,.7,.16,trim,x,2.2,1)}
- if(mystic){const crystal=new THREE.MeshStandardMaterial({color:0x71dbff,emissive:0x167bb1,emissiveIntensity:.5});cone(f,.3,.86,crystal,0,keepH+1.05,-.27,6)}
+ // The main keep grows taller and gains a second visible storey.
+ cube(f,large?1.12:.87,keepH,large?1.08:.86,stone,0,.3+keepH/2,-.23);
+ cube(f,large?1.29:1.02,.18,large?1.24:1.02,accent,0,.39+keepH,-.23);
+ cone(f,large?.88:.72,large?.93:.69,roofMat,0,.58+keepH,-.23);
+ for(const x of [-.31,.31]){
+  cube(f,.15,.3,.065,glass,x,1.1,-.23+(large?.58:.46));
+  if(progress>=3)cube(f,.15,.3,.065,glass,x,1.65,-.23+(large?.58:.46));
+ }
+ // Gatehouse, arched-look timber door, rivets and blue guild pennants.
+ cube(f,.86,1.05,.34,stone,0,.82,1.07);
+ cube(f,.52,.76,.085,beams,0,.64,1.28);
+ cube(f,.65,.13,.38,accent,0,1.4,1.08);
+ for(const x of [-.29,.29])cube(f,.085,.78,.09,metal,x,.64,1.34);
+ if(progress>=2){
+  for(const x of [-.65,.65])cube(f,.11,.42,.1,accent,x,1.14,1.1);
+ }
+ if(progress>=4){
+  for(const x of [-.72,.72]){cube(f,.26,.57,.26,wall,x,1.54,.68);cone(f,.25,.48,roofMat,x,2.07,.68)}
+ }
+ if(progress>=5){
+  cube(f,.4,.43,.43,wall,-.55,.54,-.52);
+  cone(f,.38,.35,roofMat,-.55,.94,-.52);
+ }
+ if(progress>=6){
+  cube(f,.39,.55,.41,stone,.57,.57,-.52);
+  cube(f,.45,.11,.47,accent,.57,.91,-.52);
+ }
+ if(progress>=7){
+  for(const x of [-.8,.8]){cube(f,.1,.48,.1,metal,x,1.55,1.04);cube(f,.22,.27,.055,accent,x+.12,1.67,1.04)}
+ }
+ // New architectural silhouettes at each major tier.
+ if(royal){
+  for(const x of [-.62,.62]){cube(f,.29,.62,.29,wall,x,1.7,.56);cone(f,.27,.59,roofMat,x,2.29,.56)}
+  cube(f,.34,.38,.35,accent,0,keepH+.7,-.23);
+ }
+ if(advanced){
+  for(const x of [-1,1]){cube(f,.13,.55,.13,metal,x,2.0,1);cone(f,.16,.38,accent,x,2.45,1)}
+  cube(f,.55,.09,.55,metal,0,keepH+.68,-.23);
+ }
+ if(ascended){
+  const crystal=new THREE.MeshStandardMaterial({color:0x6edfff,emissive:0x1b84bd,emissiveIntensity:.8,roughness:.17});
+  cone(f,.27,.79,crystal,0,keepH+1.15,-.23,6);
+  for(const x of [-1,1])for(const z of [-1,1])cone(f,.15,.41,crystal,x,towerH+1.17,z,6);
+ }
+ f.userData.castleLevel=lv;
+ f.userData.unifiedLevel=unified;
+ f.userData.castleStyle=stage.name;
  return f;
 }
 
