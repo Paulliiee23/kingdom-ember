@@ -30,7 +30,7 @@ export function installOwnerPanel({state,save,redraw,refresh,notify}) {
   button('⚔️ Max Troops',()=>action(()=>{maxTroops();state.jobs=state.jobs.filter(j=>j.kind!=='train');},'Troops maxed'));
   button('⭐ Max Kingdom Level',()=>action(()=>{state.level=limits.kingdom;state.xp=0;},'Kingdom level maxed'));
   button('⏱ Complete Build / Research / Train',()=>action(finishJobs,'Queued jobs completed'));
-  button('🔷 Unified Citadel +1',()=>action(()=>{const castle=state.buildings.find(b=>b.type==='castle');if(!castle)throw Error('No castle');castle.level=Math.max(castle.level,30);castle.unifiedLevel=(castle.unifiedLevel||0)+1;},'Unified Citadel stage increased'));
+  button('🔷 Unified Citadel +1',()=>action(()=>{const castle=state.buildings.find(b=>b.type==='castle');if(!castle)throw Error('No castle');castle.level=Math.max(castle.level,30);state.castleUnifiedLevel=(Number(state.castleUnifiedLevel)||0)+1;},'Unified Citadel stage increased'));
   button('👑 MAX EVERYTHING',()=>{if(!confirm('Max all current systems? Your original save will be backed up on first use.'))return;action(()=>{maxBuildings();maxResearch();maxTroops();maxResources();state.level=limits.kingdom;state.xp=0;state.jobs=[];},'All available systems maxed');});
   button('↶ Restore original owner backup',()=>{const raw=localStorage.getItem(backupKey);if(!raw)return notify('No owner backup exists');if(!confirm('Restore original backup? Current progress will be overwritten.'))return;const restored=JSON.parse(raw);Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,restored);complete('Original backup restored');});
 }
