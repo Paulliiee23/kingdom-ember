@@ -73,9 +73,34 @@ function emberDetails(g,b){const level=b.level;const castle=b.type==='castle';
 }
 function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*2.8);const level=b.level;cube(g,2.45,.18,2.45,detail.mortar,0,.09,0);cube(g,2.25,.12,2.25,detail.plaster,0,.19,0);
 if(b.type==='castle'){
- cube(g,1.8,1.55+level*.14,1.75,detail.plaster,0,1.02,0);cube(g,1.9,.16,1.88,detail.mortar,0,1.85+level*.14,0);battlements(g,1.85,1.85,2.03+level*.14);roof(g,1.65,1.65,2.4+level*.14,detail.slate);
- for(const x of [-.93,.93])for(const z of [-.93,.93]){cube(g,.57,2.12+level*.12,.57,detail.mortar,x,1.24,z);cube(g,.62,.18,.62,detail.plaster,x,2.35+level*.12,z);roof(g,.8,.8,2.84+level*.12,detail.slate);const turret=g.children[g.children.length-1];turret.position.x=x;turret.position.z=z;cube(g,.18,.33,.08,detail.glass,x,1.65,z+Math.sign(z)*.3)}
- cube(g,.57,.86,.13,detail.darkwood,0,.57,.92);cube(g,.72,.14,.2,detail.trim,0,1.05,.94);windowAt(g,-.52,1.25,.9);windowAt(g,.52,1.25,.9);flag(g,0,3.13+level*.14,0);
+ // Original Kingdom Ember timber-and-stone fortress, progressively fortified at levels 1–8.
+ const tier=Math.min(8,Math.max(1,level)),h=1.03+tier*.045;
+ const timber=detail.darkwood,rock=detail.mortar,cap=detail.plaster;
+ cube(g,2.26,.14,2.26,rock,0,.28,0);
+ for(const side of [-1,1]){
+  cube(g,2.12,h,.18,timber,0,.34+h/2,side*1.01);
+  cube(g,.18,h,2.12,timber,side*1.01,.34+h/2,0);
+  for(let p=-.9;p<=.91;p+=.45){
+   cube(g,.3,.18,.26,cap,p,.44+h,side*1.01);
+   cube(g,.26,.18,.3,cap,side*1.01,.44+h,p);
+  }
+ }
+ for(const x of [-1,1])for(const z of [-1,1]){
+  cube(g,.48,1.48+tier*.045,.48,timber,x,.98+tier*.0225,z);
+  cube(g,.56,.2,.56,cap,x,1.79+tier*.045,z);
+  if(tier>=5)roof(g,.62,.62,2.05+tier*.045,detail.slate);
+ }
+ cube(g,.86,1.62+tier*.085,.86,cap,0,1.09+tier*.0425,-.24);
+ cube(g,1.04,.17,1.04,rock,0,1.98+tier*.085,-.24);
+ roof(g,1.05,1.05,2.43+tier*.085,detail.slate);
+ cube(g,.82,1.05,.35,rock,0,.83,1.03);
+ cube(g,.49,.75,.08,timber,0,.63,1.25);
+ cube(g,.65,.13,.39,cap,0,1.41,1.04);
+ for(const x of [-.29,.29])cube(g,.11,.73,.09,detail.trim,x,.63,1.3);
+ for(const x of [-.55,.55])cube(g,.12,.4,.09,detail.glass,x,1.17,-.7);
+ flag(g,0,2.7+tier*.085,-.24);
+ if(tier>=3){cube(g,.4,.42,.43,timber,-.56,.49,-.48);cube(g,.5,.09,.5,cap,-.56,.73,-.48)}
+ if(tier>=7){cube(g,.42,.5,.45,rock,.53,.52,-.47);cube(g,.49,.12,.52,cap,.53,.83,-.47)}
 }else if(b.type==='farm'){
  cube(g,1.4,.95,1.35,detail.plaster,-.2,.72,-.12);roof(g,1.65,1.65,1.57,materials.roof);cube(g,.4,.72,.12,detail.darkwood,-.2,.53,.59);windowAt(g,.3,.94,.59);
  for(let i=0;i<4;i++)for(let j=0;j<3;j++){cube(g,.07,.25,.07,detail.wheat,-1.02+i*.3,.34,.84+j*.17)}
@@ -91,7 +116,16 @@ if(b.type==='castle'){
  cube(g,1.64,1.62,1.58,detail.plaster,0,1.03,0);cube(g,1.78,.15,1.72,detail.mortar,0,1.86,0);roof(g,1.83,1.83,2.36,detail.slate);for(let x of [-.52,.52])windowAt(g,x,1.05,.82);cube(g,.42,.74,.13,detail.darkwood,0,.54,.83);cube(g,.4,.55,.4,detail.mortar,.55,2.17,-.45);roof(g,.5,.5,2.67,detail.copper);
 }
 if(b.type!=='castle')cube(g,1.95,.045,.08,detail.trim,0,.25,1.16);architectureDetail(g,b);emberDetails(g,b);g.userData.building=b;scene.add(g);objects.push(g)}
-function clearObjects(){objects.forEach(o=>scene.remove(o));objects=[];walkers.length=0;waterFeatures=[];if(placementPreview){scene.remove(placementPreview);placementPreview=null}}function drawWorld(){clearObjects();const world=view==='world';const ground=cube(scene,world?105:44,.2,world?105:44,groundMat,0,-.18,0);objects.push(ground);if(!world){for(let x=-4;x<=4;x++)for(let z=-4;z<=4;z++){const tile=cube(scene,2.66,.06,2.66,new THREE.MeshStandardMaterial({map:grassTex,color:(x+z)%2===0?0xd9e3ca:0xcbd8c0,roughness:1}),x*2.8,-.03,z*2.8);tile.userData.plot={x,z};objects.push(tile)}state.buildings.forEach(makeBuilding);makeCityDecor();scenery(false);royalDecor();for(let i=0;i<12;i++)villager(Math.sin(i*2.9)*7,Math.cos(i*3.8)*7,i*1.1,i%5===0);for(let i=0;i<42;i++){let x=Math.sin(i*14.2)*19,z=Math.cos(i*8.31)*19;if(Math.abs(x)<13&&Math.abs(z)<13)continue;const g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.8+(i%3)*.25);scene.add(g);objects.push(g)}}else{for(let i=0;i<110;i++){const x=Math.sin(i*13.7)*44,z=Math.cos(i*6.71)*44;if(Math.abs(x)<5&&Math.abs(z)<5)continue;if(i%5===0){let g=new THREE.Group();g.position.set(x,0,z);if(i%10===0){makeMonster(g,i);g.userData.monster=i}else{makeMapFort(g,i);g.userData.mapFort=true;}scene.add(g);objects.push(g)}else{let g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.7+i%3*.25);scene.add(g);objects.push(g)}}scenery(true);let g=new THREE.Group();g.position.set(0,0,0);cube(g,3,2,3,materials.wall,0,1,0);cone(g,2.4,1.6,materials.blue,0,2.8,0);scene.add(g);objects.push(g)}}function makeMonster(g,i){const body=new THREE.MeshStandardMaterial({color:i%3===0?0x8b2f35:0x6554a0,roughness:.8});cube(g,1.4,.9,1.8,body,0,.8,0);cone(g,.55,.9,body,-.45,1.45,.5,5);cone(g,.55,.9,body,.45,1.45,.5,5);cube(g,.65,.7,.6,body,0,1.25,-.9);const eye=new THREE.MeshStandardMaterial({color:0xffd25d,emissive:0x5e2800});cube(g,.15,.12,.08,eye,-.18,1.4,-1.23);cube(g,.15,.12,.08,eye,.18,1.4,-1.23)}
+function clearObjects(){objects.forEach(o=>scene.remove(o));objects=[];walkers.length=0;waterFeatures=[];if(placementPreview){scene.remove(placementPreview);placementPreview=null}}function drawWorld(){clearObjects();const world=view==='world';const ground=cube(scene,world?105:44,.2,world?105:44,groundMat,0,-.18,0);objects.push(ground);if(!world){for(let x=-4;x<=4;x++)for(let z=-4;z<=4;z++){const tile=cube(scene,2.66,.06,2.66,new THREE.MeshStandardMaterial({map:grassTex,color:(x+z)%2===0?0xd9e3ca:0xcbd8c0,roughness:1}),x*2.8,-.03,z*2.8);tile.userData.plot={x,z};objects.push(tile)}state.buildings.forEach(makeBuilding);makeCityDecor();scenery(false);royalDecor();for(let i=0;i<12;i++)villager(Math.sin(i*2.9)*7,Math.cos(i*3.8)*7,i*1.1,i%5===0);for(let i=0;i<42;i++){let x=Math.sin(i*14.2)*19,z=Math.cos(i*8.31)*19;if(Math.abs(x)<13&&Math.abs(z)<13)continue;const g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.8+(i%3)*.25);scene.add(g);objects.push(g)}}else{for(let i=0;i<110;i++){const x=Math.sin(i*13.7)*44,z=Math.cos(i*6.71)*44;if(Math.abs(x)<5&&Math.abs(z)<5)continue;if(i%5===0){let g=new THREE.Group();g.position.set(x,0,z);if(i%10===0){makeMonster(g,i);g.userData.monster=i}else{makeMapFort(g,i);g.userData.mapFort=true;}scene.add(g);objects.push(g)}else{let g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.7+i%3*.25);scene.add(g);objects.push(g)}}scenery(true);let g=new THREE.Group();g.position.set(0,0,0);const home=state.buildings.find(b=>b.type==='castle');const lv=Math.max(1,home?.level||1);
+const wall=lv>=25?materials.roof:lv>=17?materials.blue:materials.wood;
+const cap=materials.wall,top=lv>=25?materials.roof:lv>=17?materials.blue:materials.wood;
+cube(g,3.4,.18,3.4,cap,0,.12,0);
+for(const side of [-1,1]){cube(g,3.2,1.25,.24,wall,0,.8,side*1.52);cube(g,.24,1.25,3.2,wall,side*1.52,.8,0)}
+for(const x of [-1.52,1.52])for(const z of [-1.52,1.52]){cube(g,.73,1.8,.73,wall,x,1.05,z);cube(g,.84,.2,.84,cap,x,2.02,z)}
+cube(g,1.22,2.1+Math.min(lv,25)*.025,1.2,cap,0,1.22+Math.min(lv,25)*.0125,-.25);
+cone(g,1.05,.9,top,0,2.75+Math.min(lv,25)*.025,-.25);
+cube(g,.9,1.1,.28,cap,0,.75,1.58);cube(g,.56,.77,.08,materials.wood,0,.6,1.76);
+scene.add(g);objects.push(g)}}function makeMonster(g,i){const body=new THREE.MeshStandardMaterial({color:i%3===0?0x8b2f35:0x6554a0,roughness:.8});cube(g,1.4,.9,1.8,body,0,.8,0);cone(g,.55,.9,body,-.45,1.45,.5,5);cone(g,.55,.9,body,.45,1.45,.5,5);cube(g,.65,.7,.6,body,0,1.25,-.9);const eye=new THREE.MeshStandardMaterial({color:0xffd25d,emissive:0x5e2800});cube(g,.15,.12,.08,eye,-.18,1.4,-1.23);cube(g,.15,.12,.08,eye,.18,1.4,-1.23)}
 function makeCityDecor(){const road=new THREE.MeshStandardMaterial({color:0xa59a7e,roughness:1});for(let n=-4;n<=4;n++){cube(scene,.16,.04,24.8,road,-1.4+n*2.8,-.015,0);cube(scene,24.8,.04,.16,road,0,-.015,-1.4+n*2.8)}for(let i=0;i<8;i++){const g=new THREE.Group();g.position.set(Math.sin(i*7.2)*9,0,Math.cos(i*4.8)*9);cube(g,.3,.62,.3,materials.blue,0,.45,0);cube(g,.22,.25,.22,materials.gold,0,.87,0);scene.add(g);objects.push(g);walkers.push({mesh:g,phase:i*1.7})}for(let x of [-12.7,12.7])for(let z of [-12.7,12.7]){const tower=new THREE.Group();tower.position.set(x,0,z);cube(tower,1.4,2.3,1.4,materials.wall,0,1.1,0);cone(tower,1.15,1.15,materials.blue,0,2.8,0);scene.add(tower);objects.push(tower)}for(let x of [-12.7,12.7]){cube(scene,.65,1.3,24,materials.wall,x,.7,0);cube(scene,24,1.3,.65,materials.wall,0,.7,x)}}
 function makeMapFort(g,i){cube(g,2,1.3,2,materials.stone,0,.7,0);cone(g,1.55,1.1,i%2?materials.roof:materials.blue,0,1.9,0)}function updateCamera(){const dist=view==='world'?Math.max(25,zoom*2.4):zoom;camera.position.set(focusX+Math.cos(angle)*dist,dist*.83,focusZ+Math.sin(angle)*dist);camera.lookAt(focusX,0,focusZ)}function render(){requestAnimationFrame(render);updateCamera();const t=performance.now()*.001;for(const w of walkers){const speed=w.guard?.25:.36;w.mesh.position.x=w.homeX+Math.sin(t*speed+w.phase)*1.25;w.mesh.position.z=w.homeZ+Math.cos(t*speed+w.phase)*.85;w.mesh.rotation.y=Math.atan2(Math.cos(t*speed+w.phase),-Math.sin(t*speed+w.phase))}if(placementPreview)placementPreview.children[1].material.opacity=.10+Math.sin(t*3)*.035;renderer.render(scene,camera)}render();window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),hitPoint=new THREE.Vector3();renderer.domElement.addEventListener('pointermove',e=>{if((!placing&&!moving)||view!=='city')return;mouse.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mouse,camera);if(ray.ray.intersectPlane(plane,hitPoint)){const x=Math.round(hitPoint.x/2.8),z=Math.round(hitPoint.z/2.8);if(Math.abs(x)<=4&&Math.abs(z)<=4)previewAt(x,z)}});function tap(e){mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(objects,true);for(let h of hits){let p=h.object;while(p&&!p.userData.building&&!p.userData.plot&&!p.userData.mapFort&&!p.userData.monster)p=p.parent;if(p?.userData.building){if(moving){const target=p.userData.building;if(target===moving){msg('Choose a different empty plot');return}msg('That plot is occupied');return}selected=p.userData.building;showPanel('detail');return}if(p?.userData.monster){showPanel('hunt');return}if(p?.userData.mapFort){showPanel('battle');return}if(p?.userData.plot&&(placing||moving)){if(moving)moveAt(p.userData.plot.x,p.userData.plot.z);else buildAt(p.userData.plot.x,p.userData.plot.z);return}}}const canvas=renderer.domElement;
