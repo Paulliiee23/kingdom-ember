@@ -1,3 +1,4 @@
+import { installAndroidUpdater } from './androidUpdater.js';
 import { preloadRoyalCastle, createCastleGLBInstance } from './castleGLBLoader.js';
 import { createRoyalCastleAsset } from './royalCastleAsset.js';
 import * as THREE from 'three';import './style.css';import { installOwnerPanel } from './ownerPanel.js';
@@ -812,3 +813,5 @@ function updateQueue(){const el=$('queue');if(!el)return;const jobs=state.jobs||
 
 // Local owner controls attach only after state and rendering functions are initialized.
 installOwnerPanel({state,save,redraw:drawWorld,refresh:refreshTop,notify:msg});
+
+installAndroidUpdater();
