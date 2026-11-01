@@ -127,3 +127,16 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
 #quickDrawer button{width:92px!important;min-width:92px!important;min-height:62px!important;display:flex!important;flex-direction:column;justify-content:center;align-items:center;gap:3px;font-size:22px!important;padding:5px 2px!important}
 #quickDrawer .quickLabel{display:block!important;font-size:11px!important;line-height:1.15!important;font-family:system-ui,sans-serif;white-space:normal;text-align:center}
 @media(orientation:landscape) and (max-height:500px){#quickDrawer{grid-template-columns:repeat(3,minmax(0,88px))!important;max-height:70dvh!important}#quickDrawer button{width:88px!important;min-width:88px!important;min-height:55px!important}}
+
+/* Clear three-step rally testing flow */
+.rally-lab{display:block}
+.rally-steps{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 16px}
+.rally-steps span{flex:1 1 95px;background:#293a34;border:1px solid #818e81;border-radius:7px;padding:8px 5px;text-align:center;font:600 12px system-ui,sans-serif}
+.rally-create{padding:14px!important;background:linear-gradient(145deg,#36433d,#222d2a)!important;border:2px ridge #91998c!important;border-radius:12px}
+.rally-create h3{margin:14px 0 4px!important}
+.rally-create select{min-height:48px;font-size:15px}
+.rally-auto{display:flex!important;gap:9px;align-items:center;cursor:pointer}
+.rally-auto input{width:20px;height:20px}
+.rally-primary{display:block;width:100%;min-height:55px!important;margin:14px 0 0!important;font-size:16px!important;background:linear-gradient(#677b63,#344f3d)!important;border:2px ridge #b0b8a0!important}
+.rally-active{border-left:4px solid #a2b99d!important;border-radius:8px;margin:9px 0}
+.rally-active button{min-height:42px}
