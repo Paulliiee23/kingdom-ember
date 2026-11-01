@@ -56,7 +56,7 @@ r.joined??=[];r.autoJoin??=false;
 if(r.status==='preparing'&&r.autoJoin&&g.joined){
 const started=Number.isFinite(r.started)?r.started:r.ready-30000;
 for(const a of GUILD_ALLIES){
-if(clock>=started+a.joinSeconds*1000&&clock<r.ready&&!r.joined.includes(a.id)){
+if(clock>=started+a.joinSeconds*1000&&started+a.joinSeconds*1000<r.ready&&!r.joined.includes(a.id)){
 r.joined.push(a.id);changed=true;notify(a.name+' joined your rally');
 }
 }
