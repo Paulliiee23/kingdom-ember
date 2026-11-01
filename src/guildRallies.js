@@ -17,19 +17,29 @@ const allyName=id=>GUILD_ALLIES.find(a=>a.id===id)?.name||id;
 const safe=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function rallyPanel(s){
 const g=guildState(s),now=Date.now();
-return '<section class="rally-lab"><h2>⚔️ Guild Rally Test Lab</h2><p class="muted">Offline simulated allies. Auto-join happens at 5, 10 and 15 seconds. No real players or online attacks.</p>'+
-(!g.joined?'<p>Join or create a guild to start rallies.</p>':
-'<h3>Allied castles</h3>'+GUILD_ALLIES.map(a=>'<div class="item">'+safe(a.name)+' · '+Object.values(a.army).reduce((x,y)=>x+y,0)+' troops · auto-joins at '+a.joinSeconds+'s</div>').join('')+
-'<h3>Create test rally</h3><label>Target <select id="rallyTarget">'+RALLY_TARGETS.map(t=>'<option value="'+t.id+'">'+safe(t.name)+'</option>').join('')+'</select></label>'+
-'<label>Preparation <select id="rallyDelay"><option value="30">30 seconds (quick test)</option><option value="60">1 minute</option><option value="300">5 minutes</option></select></label>'+
-'<label><input id="rallyAutoJoin" type="checkbox" checked> Automatically join simulated allies</label> <button id="rallyCreate">Set Rally</button>')+
-'<h3>Active rallies</h3>'+
-(g.rallies.length?g.rallies.map(r=>'<div class="item"><b>'+safe(targetName(r.target))+' · '+safe(r.status)+'</b>'+
-'<p>Joined: '+(r.joined.length?r.joined.map(allyName).map(safe).join(', '):'Awaiting allies')+'</p>'+
-'<p>'+ (r.status==='marching'?'Arrival':r.status==='waiting'?'Waiting for allies':'Preparation ends')+': '+(r.status==='waiting'?'paused':new Date(r.status==='marching'?r.arrive:r.ready).toLocaleTimeString())+'</p>'+
-(r.status==='preparing'?'<p>Remaining: '+Math.max(0,Math.ceil((r.ready-now)/1000))+'s · Auto-join '+(r.autoJoin?'ON':'OFF')+'</p>':'')+
-GUILD_ALLIES.filter(a=>!r.joined.includes(a.id)&&['preparing','waiting'].includes(r.status)).map(a=>'<button data-join-rally="'+safe(r.id)+'" data-ally="'+a.id+'">Join '+safe(a.name)+'</button>').join('')+'</div>').join(''):'<p>No active rallies.</p>')+
-'<h3>Rally reports</h3>'+(g.reports.length?g.reports.slice(0,12).map(r=>'<div class="item">'+(r.win?'🏆 Victory':'💀 Defeat')+' · '+safe(targetName(r.target))+' · '+r.joined+' allies ('+(r.participants||[]).map(allyName).map(safe).join(', ')+') · '+r.attackPower+' vs '+r.defensePower+'</div>').join(''):'<p>Reports appear when rallies finish.</p>')+'</section>';
+const active=g.rallies.filter(r=>r.status!=='completed');
+const steps='<div class="rally-steps"><span>1. Choose castle</span><span>2. Set timer</span><span>3. Launch rally</span></div>';
+return '<section class="rally-lab"><h2>⚔️ Rally Command</h2><p class="muted">Offline test mode — guild members are simulated, not real players.</p>'+
+(!g.joined?'<div class="item"><p>Join a guild in Guild Hall to create rallies.</p></div>':
+'<div class="item rally-create">'+steps+
+'<h3>1 · Choose your target</h3><label for="rallyTarget">Enemy castle or monster</label><select id="rallyTarget">'+RALLY_TARGETS.map(t=>'<option value="'+t.id+'">'+safe(t.name)+' · '+Object.values(t.army).reduce((a,b)=>a+b,0)+' defenders</option>').join('')+'</select>'+
+'<h3>2 · Choose preparation time</h3><label for="rallyDelay">Time for allies to join</label><select id="rallyDelay"><option value="30">30 seconds — quick test</option><option value="60">1 minute</option><option value="300">5 minutes</option></select>'+
+'<label class="rally-auto"><input id="rallyAutoJoin" type="checkbox" checked> <strong>Auto-join test allies</strong></label>'+
+'<p class="muted">Ember Vanguard joins after 5s, Violet Huntress after 10s, Iron Cavalier after 15s. Untick to test manual joining.</p>'+
+'<button id="rallyCreate" class="rally-primary">3 · START RALLY</button></div>')+
+'<h3>📯 Active rallies ('+active.length+')</h3>'+
+(active.length?active.map(r=>{
+const joined=(r.joined||[]).map(allyName).map(safe);
+const deadline=r.status==='marching'?r.arrive:r.ready;
+const time=r.status==='waiting'?'Waiting for allies':Math.max(0,Math.ceil((deadline-now)/1000))+'s remaining';
+return '<div class="item rally-active"><strong>'+safe(targetName(r.target))+'</strong>'+
+'<p><b>Status:</b> '+(r.status==='preparing'?'Gathering troops':r.status==='marching'?'Troops marching':r.status==='waiting'?'Waiting for allies':safe(r.status))+' · '+time+'</p>'+
+'<p><b>Joined ('+joined.length+'/3):</b> '+(joined.join(', ')||'Nobody yet')+'</p>'+
+(r.status==='preparing'&&r.autoJoin?'<p class="muted">Allies will join automatically while the timer runs.</p>':'')+
+GUILD_ALLIES.filter(a=>!(r.joined||[]).includes(a.id)&&['preparing','waiting'].includes(r.status)).map(a=>'<button data-join-rally="'+safe(r.id)+'" data-ally="'+a.id+'">+ '+safe(a.name)+'</button>').join('')+'</div>';
+}).join(''):'<p class="muted">No rally running. Choose a target above to begin.</p>')+
+'<h3>📜 Battle results</h3>'+
+(g.reports.length?g.reports.slice(0,12).map(r=>'<div class="item"><strong>'+(r.win?'🏆 Victory':'💀 Defeat')+' · '+safe(targetName(r.target))+'</strong><p>'+r.joined+' allies · '+r.attackPower+' attack vs '+r.defensePower+' defence</p><small>'+(r.participants||[]).map(allyName).map(safe).join(' · ')+'</small></div>').join(''):'<p class="muted">Completed rallies will appear here.</p>')+'</section>';
 }
 export function bindRallies(root,s,save,render,notify){
 const g=guildState(s);
