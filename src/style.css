@@ -215,3 +215,10 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
 }
 #titleScreen #loadTrack {box-shadow:0 0 18px rgba(151,65,245,.8) !important;}
 #titleScreen #loadFill {background:linear-gradient(90deg,#6422aa,#ae51f7,#dfb6ff) !important;}
+
+/* v0.9.5 landscape HUD collision fix: profile and resources occupy separate lanes. */
+@media (orientation:landscape) {
+ #lordProfile{position:fixed!important;top:calc(8px + env(safe-area-inset-top))!important;left:calc(8px + env(safe-area-inset-left))!important;width:min(190px,24vw)!important;max-width:24vw!important;box-sizing:border-box;overflow:hidden}
+ #top{box-sizing:border-box!important;position:absolute!important;top:0!important;left:0!important;right:0!important;width:100%!important;max-width:100%!important;padding-left:calc(min(190px,24vw) + 22px + env(safe-area-inset-left))!important;display:flex!important;justify-content:flex-end!important;align-items:flex-start!important;align-content:flex-start!important;flex-wrap:wrap!important;gap:5px!important}
+ #top .res{flex:0 1 auto!important;max-width:none!important;font-size:clamp(9px,1.2vw,12px)!important;padding:5px 6px!important}
+}
