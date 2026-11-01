@@ -1,0 +1,11 @@
+{
+  "appId": "com.kingdomember.game",
+  "appName": "Kingdom Ember",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
