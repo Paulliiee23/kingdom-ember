@@ -1,3 +1,4 @@
+import { createRoyalCastleAsset } from './royalCastleAsset.js';
 import * as THREE from 'three';import './style.css';import { installOwnerPanel } from './ownerPanel.js';
 import {renderCommunityEvents,bindCommunityEvents} from './communityEvents.js';
 import {renderHeroRoster,bindHeroRoster} from './heroRoster.js';
@@ -590,7 +591,10 @@ function royalBuildingDetail(g,b){
 function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*2.8);const level=b.level;cube(g,2.45,.18,2.45,detail.mortar,0,.09,0);cube(g,2.25,.12,2.25,detail.plaster,0,.19,0);
 if(b.type==='castle'){
  const unified=Number(state.castleUnifiedLevel||state.unifiedLevel||state.castleManaLevel||state.manaLevel||0);
- emberFortress(g,level,unified,.94);
+ // New modelled castle asset replaces the old primitive fortress visual.
+ const castleAsset=createRoyalCastleAsset(level);
+ castleAsset.scale.setScalar(.94);
+ g.add(castleAsset);
 }else if(b.type==='farm'){
  cube(g,1.4,.95,1.35,detail.plaster,-.2,.72,-.12);roof(g,1.65,1.65,1.57,materials.roof);cube(g,.4,.72,.12,detail.darkwood,-.2,.53,.59);windowAt(g,.3,.94,.59);
  for(let i=0;i<4;i++)for(let j=0;j<3;j++){cube(g,.07,.25,.07,detail.wheat,-1.02+i*.3,.34,.84+j*.17)}
