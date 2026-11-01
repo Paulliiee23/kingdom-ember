@@ -577,9 +577,62 @@ const rim=new THREE.Mesh(new THREE.SphereGeometry(radius*1.008,40,24),new THREE.
 rim.position.copy(shell.position);rim.renderOrder=4;
 scene.add(shell,rim);objects.push(shell,rim);
 }
-function drawWorld(){clearObjects();for(const e of emberEffects.values())scene.remove(e.g);emberEffects.clear();updateMarchVisuals();const world=view==='world';const ground=cube(scene,world?KINGDOM_SIZE:320,.2,world?KINGDOM_SIZE:320,groundMat,0,-.18,0);objects.push(ground);if(!world){for(let x=-6;x<=6;x++)for(let z=-6;z<=6;z++){const tile=cube(scene,2.66,.06,2.66,new THREE.MeshStandardMaterial({map:grassTex,color:(x+z)%2===0?0xd9e3ca:0xcbd8c0,roughness:1}),x*2.8,-.03,z*2.8);tile.userData.plot={x,z};objects.push(tile)}state.buildings.forEach(makeBuilding);if(shieldRemaining(state)>0){const homeCastle=state.buildings.find(b=>b.type==='castle');if(homeCastle)addCastleShield(homeCastle.x*2.8,homeCastle.z*2.8,5.2)}makeCityDecor();royalCityWalls();scenery(false);royalRiverside();royalDecor();royalLandscape();royalTerrain();for(let i=0;i<12;i++)villager(Math.sin(i*2.9)*7,Math.cos(i*3.8)*7,i*1.1,i%5===0);for(let i=0;i<42;i++){let x=Math.sin(i*14.2)*31,z=Math.cos(i*8.31)*31;if(Math.abs(x)<19&&Math.abs(z)<19)continue;const g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.8+(i%3)*.25);scene.add(g);objects.push(g)}}else{const zoneMat=new THREE.MeshStandardMaterial({color:0x94492f,transparent:true,opacity:.20,roughness:1,depthWrite:false});for(const objective of KINGDOM_OBJECTIVES){const zone=new THREE.Mesh(new THREE.PlaneGeometry(objective.size,objective.size),zoneMat);zone.rotation.x=-Math.PI/2;zone.position.set(objective.x,.035,objective.z);scene.add(zone);objects.push(zone);const g=new THREE.Group();g.position.set(objective.x,0,objective.z);if(objective.id==='base'){emberFortress(g,25,2,2.5)}else makeMapFort(g,1);g.userData.mapFort=true;g.userData.targetPosition={x:objective.x,z:objective.z};g.userData.targetType='attack';g.userData.objectiveName=objective.name;const pick=new THREE.Mesh(new THREE.CylinderGeometry(objective.id==='base'?7:3,objective.id==='base'?7:3,.3,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));pick.position.y=.2;g.add(pick);scene.add(g);objects.push(g)}{const g=new THREE.Group();g.position.set(DUMMY_CASTLE.x,0,DUMMY_CASTLE.z);emberFortress(g,DUMMY_CASTLE.level,1,1);g.userData.dummyCastle=true;g.userData.targetPosition={x:DUMMY_CASTLE.x,z:DUMMY_CASTLE.z};const pick=new THREE.Mesh(new THREE.CylinderGeometry(4,4,.4,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));pick.position.y=.2;g.add(pick);scene.add(g);objects.push(g)}for(let i=0;i<120;i++){const x=Math.sin(i*13.7)*(KINGDOM_SIZE/2-22),z=Math.cos(i*6.71)*(KINGDOM_SIZE/2-22);if(Math.abs(x)<12&&Math.abs(z)<12||inNoShieldZone(x,z))continue;const g=new THREE.Group();g.position.set(x,0,z);if(i%7===0){makeMonster(g,i);g.userData.monster=i;g.userData.monsterLevel=(Math.floor(i/7)%5)+1;const day=Math.floor(now()/86400000);const names=['Ash Drake','Forest Troll','Stone Golem','Wild Wyrm','Feral Ogre','Frost Serpent','Ember Boar','Thunder Roc'];g.userData.monsterName=names[(day*2+(i%2))%names.length];g.userData.targetPosition={x,z};const pick=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.5,.2,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));g.add(pick)}else tree(g,0,0,.7+(i%3)*.25);scene.add(g);objects.push(g)}if(shieldRemaining(state)>0)addCastleShield(HOME_POSITION.x,HOME_POSITION.z,5.5);let g=new THREE.Group();g.position.set(HOME_POSITION.x,0,HOME_POSITION.z);g.userData.homeCastle=true;const home=state.buildings.find(b=>b.type==='castle');emberFortress(g,home?.level||1,Number(state.castleUnifiedLevel||state.unifiedLevel||0),1.25);scene.add(g);objects.push(g)}}function makeMonster(g,i){const body=new THREE.MeshStandardMaterial({color:i%3===0?0x8b2f35:0x6554a0,roughness:.8});cube(g,1.4,.9,1.8,body,0,.8,0);cone(g,.55,.9,body,-.45,1.45,.5,5);cone(g,.55,.9,body,.45,1.45,.5,5);cube(g,.65,.7,.6,body,0,1.25,-.9);const eye=new THREE.MeshStandardMaterial({color:0xffd25d,emissive:0x5e2800});cube(g,.15,.12,.08,eye,-.18,1.4,-1.23);cube(g,.15,.12,.08,eye,.18,1.4,-1.23)}
+function drawWorld(){clearObjects();for(const e of emberEffects.values())scene.remove(e.g);emberEffects.clear();updateMarchVisuals();const world=view==='world';const ground=cube(scene,world?KINGDOM_SIZE:320,.2,world?KINGDOM_SIZE:320,groundMat,0,-.18,0);objects.push(ground);if(!world){for(let x=-6;x<=6;x++)for(let z=-6;z<=6;z++){const tile=cube(scene,2.66,.06,2.66,new THREE.MeshStandardMaterial({map:grassTex,color:(x+z)%2===0?0xd9e3ca:0xcbd8c0,roughness:1}),x*2.8,-.03,z*2.8);tile.userData.plot={x,z};objects.push(tile)}state.buildings.forEach(makeBuilding);if(shieldRemaining(state)>0){const homeCastle=state.buildings.find(b=>b.type==='castle');if(homeCastle)addCastleShield(homeCastle.x*2.8,homeCastle.z*2.8,5.2)}makeCityDecor();royalPaving();royalCityWalls();scenery(false);royalRiverside();royalDecor();royalLandscape();royalTerrain();for(let i=0;i<12;i++)villager(Math.sin(i*2.9)*7,Math.cos(i*3.8)*7,i*1.1,i%5===0);for(let i=0;i<42;i++){let x=Math.sin(i*14.2)*31,z=Math.cos(i*8.31)*31;if(Math.abs(x)<19&&Math.abs(z)<19)continue;const g=new THREE.Group();g.position.set(x,0,z);tree(g,0,0,.8+(i%3)*.25);scene.add(g);objects.push(g)}}else{const zoneMat=new THREE.MeshStandardMaterial({color:0x94492f,transparent:true,opacity:.20,roughness:1,depthWrite:false});for(const objective of KINGDOM_OBJECTIVES){const zone=new THREE.Mesh(new THREE.PlaneGeometry(objective.size,objective.size),zoneMat);zone.rotation.x=-Math.PI/2;zone.position.set(objective.x,.035,objective.z);scene.add(zone);objects.push(zone);const g=new THREE.Group();g.position.set(objective.x,0,objective.z);if(objective.id==='base'){emberFortress(g,25,2,2.5)}else makeMapFort(g,1);g.userData.mapFort=true;g.userData.targetPosition={x:objective.x,z:objective.z};g.userData.targetType='attack';g.userData.objectiveName=objective.name;const pick=new THREE.Mesh(new THREE.CylinderGeometry(objective.id==='base'?7:3,objective.id==='base'?7:3,.3,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));pick.position.y=.2;g.add(pick);scene.add(g);objects.push(g)}{const g=new THREE.Group();g.position.set(DUMMY_CASTLE.x,0,DUMMY_CASTLE.z);emberFortress(g,DUMMY_CASTLE.level,1,1);g.userData.dummyCastle=true;g.userData.targetPosition={x:DUMMY_CASTLE.x,z:DUMMY_CASTLE.z};const pick=new THREE.Mesh(new THREE.CylinderGeometry(4,4,.4,12),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));pick.position.y=.2;g.add(pick);scene.add(g);objects.push(g)}for(let i=0;i<120;i++){const x=Math.sin(i*13.7)*(KINGDOM_SIZE/2-22),z=Math.cos(i*6.71)*(KINGDOM_SIZE/2-22);if(Math.abs(x)<12&&Math.abs(z)<12||inNoShieldZone(x,z))continue;const g=new THREE.Group();g.position.set(x,0,z);if(i%7===0){makeMonster(g,i);g.userData.monster=i;g.userData.monsterLevel=(Math.floor(i/7)%5)+1;const day=Math.floor(now()/86400000);const names=['Ash Drake','Forest Troll','Stone Golem','Wild Wyrm','Feral Ogre','Frost Serpent','Ember Boar','Thunder Roc'];g.userData.monsterName=names[(day*2+(i%2))%names.length];g.userData.targetPosition={x,z};const pick=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.5,.2,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));g.add(pick)}else tree(g,0,0,.7+(i%3)*.25);scene.add(g);objects.push(g)}if(shieldRemaining(state)>0)addCastleShield(HOME_POSITION.x,HOME_POSITION.z,5.5);let g=new THREE.Group();g.position.set(HOME_POSITION.x,0,HOME_POSITION.z);g.userData.homeCastle=true;const home=state.buildings.find(b=>b.type==='castle');emberFortress(g,home?.level||1,Number(state.castleUnifiedLevel||state.unifiedLevel||0),1.25);scene.add(g);objects.push(g)}}function makeMonster(g,i){const body=new THREE.MeshStandardMaterial({color:i%3===0?0x8b2f35:0x6554a0,roughness:.8});cube(g,1.4,.9,1.8,body,0,.8,0);cone(g,.55,.9,body,-.45,1.45,.5,5);cone(g,.55,.9,body,.45,1.45,.5,5);cube(g,.65,.7,.6,body,0,1.25,-.9);const eye=new THREE.MeshStandardMaterial({color:0xffd25d,emissive:0x5e2800});cube(g,.15,.12,.08,eye,-.18,1.4,-1.23);cube(g,.15,.12,.08,eye,.18,1.4,-1.23)}
 function makeCityDecor(){const road=new THREE.MeshStandardMaterial({color:0xa59a7e,roughness:1});for(let n=-6;n<=6;n++){cube(scene,.16,.04,36,road,-1.4+n*2.8,-.015,0);cube(scene,36,.04,.16,road,0,-.015,-1.4+n*2.8)}for(let i=0;i<8;i++){const g=new THREE.Group();g.position.set(Math.sin(i*7.2)*9,0,Math.cos(i*4.8)*9);cube(g,.3,.62,.3,materials.blue,0,.45,0);cube(g,.22,.25,.22,materials.gold,0,.87,0);scene.add(g);objects.push(g);walkers.push({mesh:g,phase:i*1.7})}for(let x of [-18.3,18.3])for(let z of [-18.3,18.3]){const tower=new THREE.Group();tower.position.set(x,0,z);cube(tower,1.4,2.3,1.4,materials.wall,0,1.1,0);cone(tower,1.15,1.15,materials.blue,0,2.8,0);scene.add(tower);objects.push(tower)}for(let x of [-18.3,18.3]){cube(scene,.65,1.3,36,materials.wall,x,.7,0);cube(scene,36,1.3,.65,materials.wall,0,.7,x)}}
 // v0.9.5: detailed city curtain walls and gatehouse (decorative, outside building plots).
+// v0.9.5 royal paving: textured-looking stone lanes and a ceremonial square.
+// Instancing reduces draw calls, and the raised details avoid buildable plot centres.
+function royalPaving(){
+ const g=new THREE.Group();
+ const stone=[0xc0b7a4,0xd4c8ae,0xa69e90,0xe1d4b9].map(color=>new THREE.MeshStandardMaterial({color,roughness:1}));
+ const grout=new THREE.MeshStandardMaterial({color:0x7d7769,roughness:1});
+ const paving=new THREE.BoxGeometry(.39,.055,.53);
+ const transform=new THREE.Object3D();
+ const lanes=[];
+ // Existing roads lie halfway between 2.8-unit plots, so paving follows them.
+ for(let lane=-6;lane<=6;lane++){
+  const coord=-1.4+lane*2.8;
+  for(let n=-34;n<=34;n++){
+   const pos=n*.52;
+   for(let side=-1;side<=1;side+=2){
+    const offset=side*.23;
+    if(Math.abs(pos)>17.75)continue;
+    lanes.push([coord+offset,pos,lane+n+side,0]);
+    lanes.push([pos,coord+offset,lane-n+side,1]);
+   }
+  }
+ }
+ const groups=[[],[],[],[]];
+ for(const [x,z,seed,axis] of lanes){
+  // Roads are shared; keep a small gap around the central plaza.
+  if(Math.abs(x)<2.15&&Math.abs(z)<2.15)continue;
+  groups[Math.abs(seed)%4].push([x,z,axis,seed]);
+ }
+ groups.forEach((points,mi)=>{
+  const mesh=new THREE.InstancedMesh(paving,stone[mi],points.length);
+  points.forEach(([x,z,axis,seed],i)=>{
+   transform.position.set(x,.013,z);
+   transform.rotation.set(0,axis?Math.PI/2:0,0);
+   transform.scale.set(.94+(Math.abs(seed)%3)*.025,1,.96);
+   transform.updateMatrix();mesh.setMatrixAt(i,transform.matrix);
+  });
+  mesh.instanceMatrix.needsUpdate=true;mesh.receiveShadow=true;g.add(mesh);
+ });
+ // A central stone courtyard with a gold-edged compass pattern.
+ const plaza=new THREE.Mesh(new THREE.CylinderGeometry(2.25,2.25,.07,16),grout);
+ plaza.position.y=.007;plaza.receiveShadow=true;g.add(plaza);
+ const plazaStone=new THREE.MeshStandardMaterial({color:0xcac2ae,roughness:.95});
+ const square=new THREE.Mesh(new THREE.CylinderGeometry(2.04,2.04,.075,16),plazaStone);
+ square.position.y=.052;square.receiveShadow=true;g.add(square);
+ const gold=new THREE.MeshStandardMaterial({color:0xbca36d,metalness:.35,roughness:.62});
+ for(let i=0;i<8;i++){
+  const a=i*Math.PI/4;
+  const tile=new THREE.Mesh(new THREE.BoxGeometry(.11,.025,1.5),gold);
+  tile.position.set(Math.sin(a)*.84,.103,Math.cos(a)*.84);
+  tile.rotation.y=a;g.add(tile);
+ }
+ scene.add(g);objects.push(g);
+}
 function royalCityWalls(){
  const group=new THREE.Group();
  const stone=new THREE.MeshStandardMaterial({color:0xc5c0b0,roughness:.9});
