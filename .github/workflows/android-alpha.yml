@@ -33,6 +33,22 @@ jobs:
         run: npx cap add android
       - name: Sync Android assets
         run: npx cap sync android
+      - name: Lock game to landscape orientation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          path = Path('android/app/src/main/AndroidManifest.xml')
+          ET.register_namespace('android', 'http://schemas.android.com/apk/res/android')
+          tree = ET.parse(path)
+          ns = '{http://schemas.android.com/apk/res/android}'
+          activity = tree.getroot().find('./application/activity')
+          if activity is None:
+              raise SystemExit('Android main activity not found')
+          activity.set(ns + 'screenOrientation', 'landscape')
+          tree.write(path, encoding='utf-8', xml_declaration=True)
+          print('Android main activity orientation: landscape')
+          PY
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
