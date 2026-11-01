@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {simulateBattle,tierPower} from '../src/battleSimulator.js';
+import {guildState,tickRallies} from '../src/guildRallies.js';
+const battle=(a,d)=>simulateBattle(a,d);
+test('infantry counters ranged',()=>assert.ok(battle({infantry:20},{archer:20}).attackPower>battle({infantry:20},{infantry:20}).attackPower));
+test('ranged counters cavalry',()=>assert.ok(battle({archer:20},{cavalry:20}).attackPower>battle({archer:20},{archer:20}).attackPower));
+test('cavalry counters infantry',()=>assert.ok(battle({cavalry:20},{infantry:20}).attackPower>battle({cavalry:20},{cavalry:20}).attackPower));
+test('higher tiers increase strength',()=>assert.ok(tierPower(7)>tierPower(1)));
+test('losses never exceed units sent',()=>{const r=battle({infantry:{1:3,7:2},archer:1},{cavalry:100});assert.ok(r.losses.infantry[1]<=3);assert.ok(r.losses.infantry[7]<=2);assert.ok(r.losses.archer[1]<=1)});
+test('guardian rally cannot march without allies',()=>{const s={};const g=guildState(s);g.rallies.push({id:'1',target:'guardian',status:'preparing',joined:[],ready:Date.now()-1000});assert.equal(tickRallies(s,()=>{}),true);assert.equal(g.rallies[0].status,'waiting')});
+test('player rally marches without allies',()=>{const s={};const g=guildState(s);g.rallies.push({id:'1',target:'player',status:'preparing',joined:[],ready:Date.now()-1000});tickRallies(s,()=>{});assert.equal(g.rallies[0].status,'marching')});
+test('guardian rally marches with ally',()=>{const s={};const g=guildState(s);g.rallies.push({id:'1',target:'guardian',status:'preparing',joined:['a'],ready:Date.now()-1000});tickRallies(s,()=>{});assert.equal(g.rallies[0].status,'marching')});
