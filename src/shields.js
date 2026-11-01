@@ -1,8 +1,8 @@
 export const SHIELD_OPTIONS=[
 {hours:4,label:'4 hours',gems:100},{hours:8,label:'8 hours',gems:180},
-{hours:12,label:'12 hours',gems:260},{hours:24,label:'1 day',gems:450},
-{hours:72,label:'3 days',gems:1200},{hours:168,label:'7 days',gems:2500},
-{hours:336,label:'14 days',gems:4600},{hours:720,label:'30 days',gems:9000}
+{hours:12,label:'12 hours',gems:260},{hours:24,label:'1 day',gems:1000},
+{hours:72,label:'3 days',gems:3500},{hours:168,label:'7 days',gems:10000},
+{hours:336,label:'14 days',gems:24000},{hours:720,label:'30 days',gems:40000}
 ];
 export function shieldState(state){state.shieldSystem??={until:0,inventory:{}};return state.shieldSystem}
 export function shieldRemaining(state,time=Date.now()){return Math.max(0,shieldState(state).until-time)}
