@@ -140,3 +140,65 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
 .rally-primary{display:block;width:100%;min-height:55px!important;margin:14px 0 0!important;font-size:16px!important;background:linear-gradient(#677b63,#344f3d)!important;border:2px ridge #b0b8a0!important}
 .rally-active{border-left:4px solid #a2b99d!important;border-radius:8px;margin:9px 0}
 .rally-active button{min-height:42px}
+
+
+/* Kingdom Ember Royal HUD — original fantasy mobile design, v0.9.5 */
+:root{--ember-gold:#f2cc7b;--ember-border:#bb8947;--ember-night:#111a2c;--ember-blue:#263a58}
+#top{position:fixed!important;z-index:12!important;inset:0 0 auto!important;display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;justify-content:flex-start!important;gap:clamp(4px,.7vw,12px)!important;padding:calc(6px + env(safe-area-inset-top)) 8px 8px!important;max-width:100%!important;min-height:64px;background:linear-gradient(180deg,rgba(10,18,34,.93),rgba(13,24,43,.72) 80%,transparent)!important;box-shadow:none!important;pointer-events:none}
+#top>*{pointer-events:auto}
+#lordProfile{flex:0 0 clamp(138px,24vw,280px)!important;min-width:0!important;min-height:54px!important;display:flex!important;align-items:center!important;gap:8px!important;padding:3px 8px 3px 3px!important;border:2px ridge #e7b75e!important;border-radius:32px 9px 9px 32px!important;background:linear-gradient(120deg,#43321d,#1b2942 55%,#101b2d)!important;box-shadow:inset 0 0 0 1px #644a28,0 3px 12px #000a!important;color:#fff2ce!important;text-align:left}
+.profile-crest{display:grid;place-items:center;flex:0 0 45px;height:45px;border-radius:50%;border:2px solid #f1cb7a;background:radial-gradient(circle at 35% 25%,#a57b38,#35233c 72%);font-size:27px;text-shadow:0 2px 5px #000}
+.profile-meta{display:flex;flex-direction:column;min-width:0;gap:3px}
+#playerNameHud{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(12px,1.5vw,20px);line-height:1.1;font-weight:900;text-shadow:0 2px 3px #000}
+.profile-meta small{font:600 10px system-ui,sans-serif;color:#eac27c;white-space:nowrap}
+#top .res{flex:1 1 0!important;min-width:0!important;max-width:185px!important;min-height:40px!important;display:flex!important;align-items:center;justify-content:center;padding:7px 5px!important;margin-top:6px;font:800 clamp(10px,1.3vw,17px) system-ui,sans-serif!important;color:#fff1ce!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:2px ridge #ba904f!important;border-radius:18px!important;background:linear-gradient(180deg,#25334d,#121a2a 72%,#0d1422)!important;box-shadow:inset 0 1px 0 #ffffff25,0 3px 8px #0008!important;font-variant-numeric:tabular-nums}
+#activityRail,#eventRail{position:fixed;z-index:9;display:flex;flex-direction:column;gap:6px;top:clamp(90px,18vh,145px);max-height:calc(100dvh - 195px);overflow-y:auto;scrollbar-width:none}
+#activityRail{left:calc(7px + env(safe-area-inset-left))}
+#eventRail{right:calc(7px + env(safe-area-inset-right))}
+#activityRail button,#eventRail button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px;border:2px ridge #c69b58!important;background:linear-gradient(135deg,#36435a,#17233a 55%,#322a29)!important;box-shadow:inset 0 1px #ffffff30,0 3px 8px #0009!important;color:#fff0c7!important;text-shadow:0 2px 3px #000;font-size:21px!important}
+#activityRail button{width:116px;justify-content:flex-start;padding:6px 9px!important;border-radius:8px 19px 19px 8px!important}
+#eventRail button{width:80px;flex-direction:column;gap:1px;padding:5px 4px!important;border-radius:14px!important}
+#activityRail button span,#eventRail button span{font:800 11px system-ui,sans-serif;letter-spacing:.1px}
+#bottom{position:fixed!important;z-index:13!important;left:50%!important;right:auto!important;bottom:calc(4px + env(safe-area-inset-bottom))!important;transform:translateX(-50%);width:min(94vw,820px)!important;display:flex!important;flex-wrap:nowrap!important;justify-content:space-around!important;align-items:end!important;gap:clamp(3px,.9vw,12px)!important;padding:5px 9px!important;overflow:visible!important;background:linear-gradient(180deg,#29344ac9,#0e1729f2)!important;border:2px ridge #b8894e!important;border-radius:22px!important;box-shadow:0 6px 22px #000c,inset 0 2px #e4bd7233!important}
+#bottom button{flex:1 1 0!important;min-width:0!important;width:auto!important;max-width:115px;min-height:clamp(57px,9vh,83px)!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:2px!important;padding:5px 2px!important;font-size:clamp(22px,3vw,32px)!important;line-height:1.1;border:2px ridge #e4b76c!important;border-radius:50% 50% 14px 14px!important;background:radial-gradient(ellipse at 50% 20%,#6d5738,#303348 54%,#151e32 85%)!important;box-shadow:inset 0 2px 4px #ffdb873b,0 4px 9px #000a!important;color:#fff1c9!important}
+#bottom button span{font:800 clamp(9px,1vw,12px) system-ui,sans-serif!important;color:#fff0d1;text-shadow:0 2px 3px #000;white-space:nowrap}
+#bottom button:active,#activityRail button:active,#eventRail button:active{filter:brightness(1.35);transform:translateY(1px)}
+#quickActions{z-index:14!important;right:calc(10px + env(safe-area-inset-right))!important;top:auto!important;bottom:calc(110px + env(safe-area-inset-bottom))!important}
+#quickToggle{border:2px ridge #d8a85b!important;border-radius:50%!important;background:linear-gradient(#354766,#17243b)!important;box-shadow:0 4px 14px #000a!important}
+#quickDrawer{bottom:45px!important;top:auto!important;right:0!important}
+#panel{background:linear-gradient(155deg,rgba(39,54,75,.98),rgba(15,25,43,.98) 48%,rgba(30,28,40,.98))!important;border:3px ridge #d1a663!important;box-shadow:0 15px 60px #000d,inset 0 0 0 2px #614a30!important;color:#f7e6c1!important}
+#panel h2{border-bottom:1px solid #a77b49;padding-bottom:9px;color:#f6d58d!important;text-shadow:0 2px 4px #000}
+#panel .item,.rally-create{background:linear-gradient(145deg,#2c3d55b8,#152238bb)!important;border:1px solid #866a48!important;border-radius:10px!important;margin:7px 0}
+#panel button{background:linear-gradient(#6b5737,#292d40)!important;border:2px ridge #c39a5a!important;color:#ffedca!important;box-shadow:inset 0 1px #fff2!important}
+#panel input:not([type=checkbox]),#panel select{background:#111e32!important;color:#f9e7c4!important;border:1px solid #a98a59!important;border-radius:8px!important}
+#toast{z-index:30!important;background:#17243a!important;border:2px ridge #e0b366!important;box-shadow:0 6px 20px #000b}
+#emberOwnerPanel{z-index:24!important;bottom:calc(112px + env(safe-area-inset-bottom))!important;background:linear-gradient(#34445b,#16243b)!important;border:2px ridge #d1a663!important}
+@media(max-width:700px){
+ #top{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;padding:calc(3px + env(safe-area-inset-top)) 4px 5px!important}
+ #lordProfile{grid-column:1/-1;min-height:39px!important;max-width:210px!important;padding:2px 6px 2px 2px!important}
+ .profile-crest{height:34px;flex-basis:34px;font-size:21px}
+ .profile-meta small{font-size:9px}
+ #top .res{width:100%;max-width:none!important;min-height:30px!important;margin:0!important;padding:3px 1px!important;font-size:clamp(8px,2.2vw,12px)!important;border-radius:9px!important}
+ #activityRail,#eventRail{top:clamp(100px,20vh,140px);gap:4px;max-height:calc(100dvh - 205px)}
+ #activityRail button{width:48px;min-height:44px;flex-direction:column;padding:3px 1px!important;font-size:20px!important}
+ #eventRail button{width:48px;min-height:44px;padding:3px 1px!important;font-size:20px!important}
+ #activityRail button span,#eventRail button span{font-size:8px}
+ #bottom{width:calc(100vw - 8px)!important;gap:2px!important;padding:3px!important;border-radius:12px!important}
+ #bottom button{min-height:56px!important;font-size:23px!important;border-radius:14px!important}
+ #bottom button span{font-size:9px!important}
+ #quickActions{bottom:calc(82px + env(safe-area-inset-bottom))!important;right:7px!important}
+ #emberOwnerPanel{bottom:calc(80px + env(safe-area-inset-bottom))!important}
+ #panel{top:calc(12px + env(safe-area-inset-top))!important;max-height:calc(100dvh - 30px - env(safe-area-inset-top))!important}
+}
+@media(orientation:landscape) and (max-height:500px){
+ #top{display:flex!important;width:100%!important;max-width:100%!important;grid-template-columns:none!important}
+ #lordProfile{flex-basis:165px!important;min-height:39px!important}
+ #top .res{max-width:130px!important}
+ #activityRail,#eventRail{top:68px;max-height:calc(100dvh - 132px)}
+ #activityRail button,#eventRail button{min-height:38px}
+ #bottom{width:min(75vw,690px)!important;bottom:2px!important}
+ #bottom button{min-height:43px!important;font-size:19px!important;flex-direction:column!important}
+ #bottom button span{font-size:9px!important}
+ #quickActions{bottom:67px!important}
+}
+@media(prefers-reduced-motion:reduce){#bottom button,#activityRail button,#eventRail button{transition:none!important}}
