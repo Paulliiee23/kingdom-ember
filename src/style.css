@@ -87,3 +87,35 @@ button{transition:filter .18s ease,transform .18s ease}button:hover{filter:brigh
 .guild-hall .item{border-color:#858b80}
 @media(max-width:650px){#top{padding-left:43vw;gap:3px}#top .res{font-size:10px;padding:4px 5px}#lordProfile{font-size:11px;padding:6px;max-width:41vw}#bottom button{min-width:62px;font-size:12px;padding:5px 8px}#bottom button span{display:block}#quickActions button{width:38px;min-height:38px;font-size:17px}#visualTag{display:none!important}}
 @media(max-height:440px){#quickActions{top:54%;max-height:55vh}#bottom button{min-height:38px}#hint{display:none!important}}
+
+/* Android-first UI layout. Overrides earlier desktop presentation rules. */
+html,body,#app{width:100%;height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none}
+#scene{position:fixed;inset:0}
+#top{position:fixed!important;z-index:9;top:calc(5px + env(safe-area-inset-top));left:auto;right:calc(6px + env(safe-area-inset-right));width:min(57vw,350px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:3px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important}
+#top .res{min-width:0;text-align:center;padding:6px 2px!important;font-size:clamp(10px,2.8vw,13px)!important;overflow:hidden;text-overflow:ellipsis}
+#lordProfile{position:fixed;z-index:10;left:calc(7px + env(safe-area-inset-left));top:calc(7px + env(safe-area-inset-top));width:min(38vw,175px);min-height:54px;display:flex;align-items:center;gap:8px;font-size:12px!important;padding:8px!important}
+#quickActions{position:fixed!important;z-index:11;right:calc(8px + env(safe-area-inset-right));top:42%!important;transform:none!important;max-height:none!important;overflow:visible!important;display:flex;flex-direction:column;align-items:flex-end}
+#quickToggle{width:54px!important;height:54px!important;border-radius:50%!important;font-size:25px!important}
+#quickDrawer{display:grid;grid-template-columns:repeat(3,48px);gap:5px;max-height:45dvh;overflow-y:auto;background:rgba(24,29,27,.94);padding:8px;border:3px ridge #8d9389;border-radius:12px}
+#quickDrawer button{min-width:44px!important;min-height:44px!important;width:44px!important}
+#bottom{position:fixed!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;display:flex!important;justify-content:center!important;overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important;gap:10px!important;padding:0!important}
+#bottom button{min-width:76px!important;min-height:58px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:17px!important;border-radius:12px!important}
+#bottom button span{font-size:11px;display:block}
+#panel{position:fixed!important;z-index:15;top:calc(9px + env(safe-area-inset-top))!important;left:50%!important;right:auto!important;transform:translateX(-50%);width:min(95vw,560px)!important;max-height:calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;padding:18px!important;border-radius:16px!important;font-size:15px!important}
+#panel h2{font-size:clamp(20px,5vw,26px)!important}
+#panel p,#panel label{font-size:14px!important;line-height:1.5}
+#panel button,#panel select,#panel input{min-height:44px}
+#panel input:not([type=checkbox]),#panel select{max-width:100%;font-size:16px}
+#panel .item{padding:12px!important}
+#hint,#visualTag{display:none!important}
+#worldCoords{bottom:calc(83px + env(safe-area-inset-bottom))!important;left:8px!important}
+#titleScreen{padding:16px!important}
+#titleScreen h1{font-size:clamp(30px,9vw,56px)!important}
+#titleScreen>div{max-width:96vw}
+@media (orientation:landscape) and (max-height:500px){
+#top{width:min(46vw,420px);grid-template-columns:repeat(5,minmax(0,1fr))}
+#lordProfile{min-height:42px}
+#quickActions{top:27%!important}
+#bottom button{min-height:44px!important;flex-direction:row;gap:5px}
+#panel{width:min(80vw,750px)!important}
+}
