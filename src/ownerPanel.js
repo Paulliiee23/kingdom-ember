@@ -12,8 +12,11 @@ export function installOwnerPanel({state,save,redraw,refresh,notify}) {
   const toggle=document.createElement('button');
   toggle.textContent='♛ OWNER';toggle.title='Local single-player test tools';
   toggle.style.cssText='position:fixed;z-index:99998;right:12px;top:12px;background:#59248b;color:white;border:1px solid #a876dd;border-radius:12px;padding:12px;font-weight:700;cursor:pointer';
-  document.body.append(toggle,overlay);
-  toggle.onclick=()=>{overlay.style.display=overlay.style.display==='none'?'block':'none';};
+  document.body.append(overlay);
+  const bottomToggle=document.querySelector('#ownerBottomButton');
+  const ownerToggle=bottomToggle||toggle;
+  if(!bottomToggle)document.body.append(toggle);
+  ownerToggle.onclick=()=>{const open=overlay.style.display==='none';overlay.style.display=open?'block':'none';ownerToggle.setAttribute('aria-expanded',String(open));};
   const button=(label,fn)=>{const el=document.createElement('button');el.textContent=label;el.style.cssText='background:#67339d;color:white;border:1px solid #b48bd7;border-radius:9px;padding:10px;margin:4px;cursor:pointer';el.onclick=()=>{try{fn();}catch(error){console.error(error);notify('Owner action failed; save unchanged where possible');}};overlay.append(el);};
   const maxBuildings=()=>{for(const b of state.buildings||[])b.level=Math.max(b.level||1,limits.building);};
   const maxResearch=()=>{for(const k of Object.keys(state.research||{}))state.research[k]=limits.research;};
