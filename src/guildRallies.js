@@ -1,10 +1,84 @@
 import {simulateBattle} from './battleSimulator.js';
-export const GUILD_ALLIES=[{id:'a',name:'Ember Vanguard',army:{infantry:12,archer:6,cavalry:4}},{id:'b',name:'Violet Huntress',army:{infantry:3,archer:15,cavalry:5}},{id:'c',name:'Iron Cavalier',army:{infantry:5,archer:3,cavalry:14}}];
-export function guildState(s){s.testGuild??={name:'Ember Alliance',tag:'EMB',rallies:[],reports:[],joined:true,coins:0,helped:[],helpRequests:[]};return s.testGuild}
-export function rallyPanel(s){const g=guildState(s);return '<h2>🛡️ Guild & War Rallies</h2><p>['+g.tag+'] '+g.name+' · Offline test guild</p><h3>Allied castles</h3>'+GUILD_ALLIES.map(a=>'<div class="item">'+a.name+' · '+Object.values(a.army).reduce((x,y)=>x+y,0)+' available rally troops</div>').join('')+'<h3>Create rally</h3><label>Target <select id="rallyTarget"><option value="player">Training Dummy Castle (player)</option><option value="guardian">Guardian (monster)</option></select></label><label>Preparation <select id="rallyDelay"><option value="30">30 seconds</option><option value="60">1 minute</option><option value="300">5 minutes</option></select></label><button id="rallyCreate">Set Rally</button><h3>Active rallies</h3>'+g.rallies.map(r=>'<div class="item"><b>'+r.target+' · '+r.status+'</b><p>Joined: '+r.joined.join(', ')+'</p><p>Preparation ends: '+new Date(r.ready).toLocaleTimeString()+'</p>'+GUILD_ALLIES.filter(a=>!r.joined.includes(a.id)&&['preparing','waiting'].includes(r.status)).map(a=>'<button data-join-rally="'+r.id+'" data-ally="'+a.id+'">Join '+a.name+'</button>').join('')+'</div>').join('')+'<h3>Rally reports</h3>'+g.reports.slice(0,8).map(r=>'<div class="item">'+(r.win?'🏆 Victory':'💀 Defeat')+' · '+r.target+' · '+r.joined+' allies · '+r.attackPower+' vs '+r.defensePower+'</div>').join('')}
-export function bindRallies(root,s,save,render,notify){const g=guildState(s);root.querySelector('#rallyCreate')?.addEventListener('click',()=>{const target=root.querySelector('#rallyTarget').value,delay=Number(root.querySelector('#rallyDelay').value);g.rallies.push({id:Date.now()+'-'+g.rallies.length,target,status:'preparing',joined:[],ready:Date.now()+delay*1000});save();render();notify('Rally preparation started')});root.querySelectorAll('[data-join-rally]').forEach(b=>b.addEventListener('click',()=>{const r=g.rallies.find(r=>r.id===b.dataset.joinRally);if(r&&['preparing','waiting'].includes(r.status)&&!r.joined.includes(b.dataset.ally)){r.joined.push(b.dataset.ally);if(r.status==='waiting'){r.status='preparing';r.ready=Date.now()+30000}save();render()}}))}
-export function tickRallies(s,notify){const g=guildState(s);let changed=false;for(const r of g.rallies){if(r.status!=='preparing'||Date.now()<r.ready)continue;if(r.target==='guardian'&&!r.joined.length){r.status='waiting';notify('Guardian rally cannot march without allies');changed=true;continue}r.status='marching';r.arrive=Date.now()+30000;changed=true}for(const r of g.rallies){if(r.status!=='marching'||Date.now()<r.arrive)continue;const army={infantry:10,archer:10,cavalry:10};for(const id of r.joined){const ally=GUILD_ALLIES.find(a=>a.id===id);if(ally)for(const [u,n] of Object.entries(ally.army))army[u]+=n}const attackBonus=(s.research?.attack||0)*.05+(s.rallyHeroAttackBonus||0)+(s.rallyPetAttackBonus||0);const defenseBonus=(s.rallyDefenderHeroBonus||0)+(s.rallyDefenderPetBonus||0);const defender=r.target==='guardian'?{infantry:15,archer:20,cavalry:10}:{infantry:8,archer:10,cavalry:6};const result=simulateBattle(army,defender,{attackBonus,defenseBonus});g.reports.unshift({target:r.target,joined:r.joined.length,...result,time:Date.now()});r.status='completed';notify('Rally completed — check guild reports');changed=true}if(changed){g.rallies=g.rallies.filter(r=>r.status!=='completed');g.reports=g.reports.slice(0,30)}return changed}
-
+export const GUILD_ALLIES=[
+{id:'a',name:'Ember Vanguard',army:{infantry:12,archer:6,cavalry:4},joinSeconds:5},
+{id:'b',name:'Violet Huntress',army:{infantry:3,archer:15,cavalry:5},joinSeconds:10},
+{id:'c',name:'Iron Cavalier',army:{infantry:5,archer:3,cavalry:14},joinSeconds:15}
+];
+export const RALLY_TARGETS=[
+{id:'player',name:'Training Dummy Castle',army:{infantry:8,archer:10,cavalry:6}},
+{id:'scout',name:'Border Outpost (Easy)',army:{infantry:6,archer:4,cavalry:2}},
+{id:'fortress',name:'Ironhold Fortress (Medium)',army:{infantry:25,archer:18,cavalry:15}},
+{id:'citadel',name:'Ashen Citadel (Hard)',army:{infantry:90,archer:80,cavalry:65}},
+{id:'guardian',name:'Guardian Monster',army:{infantry:15,archer:20,cavalry:10}}
+];
+export function guildState(s){s.testGuild??={name:'Ember Alliance',tag:'EMB',rallies:[],reports:[],joined:true,coins:0,helped:[],helpRequests:[]};s.testGuild.rallies??=[];s.testGuild.reports??=[];return s.testGuild}
+const targetName=id=>RALLY_TARGETS.find(t=>t.id===id)?.name||'Unknown target';
+const allyName=id=>GUILD_ALLIES.find(a=>a.id===id)?.name||id;
+const safe=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function rallyPanel(s){
+const g=guildState(s),now=Date.now();
+return '<section class="rally-lab"><h2>⚔️ Guild Rally Test Lab</h2><p class="muted">Offline simulated allies. Auto-join happens at 5, 10 and 15 seconds. No real players or online attacks.</p>'+
+(!g.joined?'<p>Join or create a guild to start rallies.</p>':
+'<h3>Allied castles</h3>'+GUILD_ALLIES.map(a=>'<div class="item">'+safe(a.name)+' · '+Object.values(a.army).reduce((x,y)=>x+y,0)+' troops · auto-joins at '+a.joinSeconds+'s</div>').join('')+
+'<h3>Create test rally</h3><label>Target <select id="rallyTarget">'+RALLY_TARGETS.map(t=>'<option value="'+t.id+'">'+safe(t.name)+'</option>').join('')+'</select></label>'+
+'<label>Preparation <select id="rallyDelay"><option value="30">30 seconds (quick test)</option><option value="60">1 minute</option><option value="300">5 minutes</option></select></label>'+
+'<label><input id="rallyAutoJoin" type="checkbox" checked> Automatically join simulated allies</label> <button id="rallyCreate">Set Rally</button>')+
+'<h3>Active rallies</h3>'+
+(g.rallies.length?g.rallies.map(r=>'<div class="item"><b>'+safe(targetName(r.target))+' · '+safe(r.status)+'</b>'+
+'<p>Joined: '+(r.joined.length?r.joined.map(allyName).map(safe).join(', '):'Awaiting allies')+'</p>'+
+'<p>'+ (r.status==='marching'?'Arrival':r.status==='waiting'?'Waiting for allies':'Preparation ends')+': '+(r.status==='waiting'?'paused':new Date(r.status==='marching'?r.arrive:r.ready).toLocaleTimeString())+'</p>'+
+(r.status==='preparing'?'<p>Remaining: '+Math.max(0,Math.ceil((r.ready-now)/1000))+'s · Auto-join '+(r.autoJoin?'ON':'OFF')+'</p>':'')+
+GUILD_ALLIES.filter(a=>!r.joined.includes(a.id)&&['preparing','waiting'].includes(r.status)).map(a=>'<button data-join-rally="'+safe(r.id)+'" data-ally="'+a.id+'">Join '+safe(a.name)+'</button>').join('')+'</div>').join(''):'<p>No active rallies.</p>')+
+'<h3>Rally reports</h3>'+(g.reports.length?g.reports.slice(0,12).map(r=>'<div class="item">'+(r.win?'🏆 Victory':'💀 Defeat')+' · '+safe(targetName(r.target))+' · '+r.joined+' allies ('+(r.participants||[]).map(allyName).map(safe).join(', ')+') · '+r.attackPower+' vs '+r.defensePower+'</div>').join(''):'<p>Reports appear when rallies finish.</p>')+'</section>';
+}
+export function bindRallies(root,s,save,render,notify){
+const g=guildState(s);
+root.querySelector('#rallyCreate')?.addEventListener('click',()=>{
+if(!g.joined)return notify('Join a guild first');
+const target=root.querySelector('#rallyTarget').value,delay=Number(root.querySelector('#rallyDelay').value),started=Date.now();
+if(!RALLY_TARGETS.some(t=>t.id===target)||![30,60,300].includes(delay))return notify('Invalid rally settings');
+g.rallies.push({id:started+'-'+g.rallies.length,target,status:'preparing',joined:[],started,ready:started+delay*1000,autoJoin:root.querySelector('#rallyAutoJoin').checked});
+save();render();notify('Rally preparation started. Allies will join automatically if enabled');
+});
+root.querySelectorAll('[data-join-rally]').forEach(b=>b.addEventListener('click',()=>{
+const r=g.rallies.find(x=>x.id===b.dataset.joinRally);
+if(r&&['preparing','waiting'].includes(r.status)&&GUILD_ALLIES.some(a=>a.id===b.dataset.ally)&&!r.joined.includes(b.dataset.ally)){
+r.joined.push(b.dataset.ally);
+if(r.status==='waiting'){r.status='preparing';r.ready=Date.now()+30_000}
+save();render();notify(allyName(b.dataset.ally)+' joined the rally')
+}
+}));
+}
+export function tickRallies(s,notify,clock=Date.now()){
+const g=guildState(s);let changed=false;
+for(const r of g.rallies){
+r.joined??=[];r.autoJoin??=false;
+if(r.status==='preparing'&&r.autoJoin&&g.joined){
+const started=Number.isFinite(r.started)?r.started:r.ready-30000;
+for(const a of GUILD_ALLIES){
+if(clock>=started+a.joinSeconds*1000&&clock<r.ready&&!r.joined.includes(a.id)){
+r.joined.push(a.id);changed=true;notify(a.name+' joined your rally');
+}
+}
+}
+if(r.status==='preparing'&&clock>=r.ready){
+if(!r.joined.length){r.status='waiting';changed=true;notify('Rally waiting for allies');continue}
+r.status='marching';r.arrive=clock+30000;changed=true;notify('Rally marching on '+targetName(r.target));
+}
+if(r.status==='marching'&&clock>=r.arrive){
+const army={infantry:10,archer:10,cavalry:10};
+for(const id of r.joined){const a=GUILD_ALLIES.find(x=>x.id===id);if(a)for(const [unit,count] of Object.entries(a.army))army[unit]+=count}
+const attackBonus=(s.research?.attack||0)*.05+(s.rallyHeroAttackBonus||0)+(s.rallyPetAttackBonus||0);
+const defenseBonus=(s.rallyDefenderHeroBonus||0)+(s.rallyDefenderPetBonus||0);
+const defender=RALLY_TARGETS.find(t=>t.id===r.target)?.army||RALLY_TARGETS[0].army;
+const result=simulateBattle(army,defender,{attackBonus,defenseBonus});
+g.reports.unshift({target:r.target,joined:r.joined.length,participants:[...r.joined],...result,time:clock});
+r.status='completed';changed=true;notify('Rally completed — check Guild Hall reports');
+}
+}
+if(changed){g.rallies=g.rallies.filter(r=>r.status!=='completed');g.reports=g.reports.slice(0,30)}
+return changed;
+}
 const escapeGuild=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 export function guildHallPanel(s){const g=guildState(s);g.coins??=0;g.helped??=[];g.helpRequests??=[];g.joined??=true;
 const directory=[{tag:'EMB',name:'Ember Alliance'},{tag:'STN',name:'Stone Wardens'},{tag:'FRG',name:'Forge Keepers'}];
