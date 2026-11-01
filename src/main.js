@@ -381,6 +381,89 @@ function emberFortress(parent,level,unified=0,size=1){
  return f;
 }
 
+// v0.9.5 royal building kit. All geometry is cosmetic; no gameplay/save changes.
+const royalKit={
+ blue:new THREE.MeshStandardMaterial({color:0x365f91,roughness:.56,metalness:.12}),
+ gold:new THREE.MeshStandardMaterial({color:0xd6b56d,roughness:.42,metalness:.43}),
+ ivory:new THREE.MeshStandardMaterial({color:0xe0d7bd,roughness:.9}),
+ timber:new THREE.MeshStandardMaterial({color:0x5b4031,roughness:.94}),
+ copper:new THREE.MeshStandardMaterial({color:0x9b7545,roughness:.62,metalness:.28}),
+ glow:new THREE.MeshStandardMaterial({color:0xf6d899,emissive:0x96571d,emissiveIntensity:.46}),
+ leaf:new THREE.MeshStandardMaterial({color:0x568354,roughness:1})
+};
+function royalBuildingDetail(g,b){
+ const k=royalKit,lv=Math.max(1,Number(b.level)||1);
+ const ornament=lv>=5,grand=lv>=12;
+ // Consistent carved stone corners, gilded foundation and entry lanterns.
+ for(const x of [-1,1])for(const z of [-1,1]){
+  cube(g,.16,.26,.16,k.ivory,x*.99,.33,z*.99);
+  cube(g,.2,.055,.2,k.gold,x*.99,.49,z*.99);
+ }
+ for(const x of [-.61,.61]){
+  cube(g,.12,.3,.13,k.timber,x,.47,1.04);
+  cube(g,.15,.17,.15,k.glow,x,.69,1.04);
+  cone(g,.11,.17,k.copper,x,.86,1.04,4);
+ }
+ if(b.type==='farm'){
+  // Raised crop rows, a little grain silo and an awning.
+  for(let i=0;i<4;i++){
+   const x=-.93+i*.34;
+   cube(g,.22,.08,.72,k.timber,x,.29,.76);
+   for(let j=0;j<5;j++)cone(g,.06,.27,detail.wheat,x,.51,.46+j*.15,5);
+  }
+  cylinder(g,.3,.34,.93,k.ivory,.77,.73,-.63,10);
+  cone(g,.4,.47,k.blue,.77,1.42,-.63,8);
+  cube(g,.78,.065,.5,k.blue,-.15,1.19,.72);
+  if(ornament)flag(g,.66,1.8,-.65,0x41699c);
+ }else if(b.type==='lumber'){
+  // Timber yard, saw-frame and stacked logs.
+  for(let i=0;i<5;i++){
+   cylinder(g,.12,.12,1.12,k.timber,.82,.43+i*.23,-.35,8).rotation.z=Math.PI/2;
+  }
+  for(const x of [-.55,.55])cube(g,.12,.93,.13,k.gold,x,.89,.79);
+  cube(g,1.34,.11,.12,k.gold,0,1.35,.79);
+  cone(g,.24,.54,k.blue,-.76,1.65,-.55,4);
+  if(grand)flag(g,.85,1.75,.3,0x315d93);
+ }else if(b.type==='quarry'){
+  // Stonecutting crane, stacked blocks and a blue work canopy.
+  for(const x of [-.8,-.38,.04])for(let j=0;j<2;j++)cube(g,.36,.22,.33,k.ivory,x,.39+j*.23,.91);
+  cube(g,.12,1.38,.12,k.timber,.81,.96,-.56);
+  cube(g,1.05,.12,.12,k.timber,.43,1.65,-.56);
+  cube(g,.035,.57,.035,k.gold,.03,1.32,-.56);
+  cube(g,.35,.26,.35,k.ivory,.03,.94,-.56);
+  if(ornament)cone(g,.24,.47,k.blue,-.66,1.28,-.5,4);
+ }else if(b.type==='mine'){
+  // Ore carts, braced doorway and copper chimney.
+  for(const x of [-.54,.54]){
+   cube(g,.4,.28,.4,k.timber,x,.39,1.0);
+   for(const dx of [-.15,.15])cylinder(g,.075,.075,.05,k.copper,x+dx,.22,1.19,8).rotation.z=Math.PI/2;
+  }
+  for(const x of [-.43,.43])cube(g,.11,.86,.14,k.gold,x,.75,.84);
+  cube(g,.97,.12,.16,k.gold,0,1.23,.84);
+  cylinder(g,.19,.23,.65,k.copper,.65,1.7,-.48,8);
+  if(grand)cone(g,.26,.48,k.blue,.65,2.25,-.48,6);
+ }else if(b.type==='barracks'){
+  // Twin guard posts, banners and polished blue roof cap.
+  for(const x of [-.82,.82]){
+   cube(g,.36,.92,.35,k.ivory,x,.84,-.6);
+   cone(g,.3,.57,k.blue,x,1.58,-.6,4);
+   cube(g,.1,.17,.07,k.glow,x,1.1,-.37);
+   if(ornament)flag(g,x,1.83,-.6,0x345b92);
+  }
+  cube(g,1.3,.11,.18,k.gold,0,1.39,.8);
+  cube(g,.65,.08,.55,k.blue,0,1.43,.83);
+ }else{
+  // Civic and research buildings gain roof dormers and stone colonnades.
+  for(const x of [-.58,.58]){
+   cube(g,.22,.87,.2,k.ivory,x,.78,.92);
+   cube(g,.27,.1,.23,k.gold,x,1.26,.92);
+   cube(g,.18,.29,.12,k.glow,x,1.5,.65);
+   cone(g,.25,.47,k.blue,x,2.44,-.42,4);
+  }
+  cube(g,1.32,.1,.15,k.gold,0,1.91,.87);
+  if(grand)flag(g,.82,2.5,-.5,0x365f91);
+ }
+}
 function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*2.8);const level=b.level;cube(g,2.45,.18,2.45,detail.mortar,0,.09,0);cube(g,2.25,.12,2.25,detail.plaster,0,.19,0);
 if(b.type==='castle'){
  const unified=Number(state.castleUnifiedLevel||state.unifiedLevel||state.castleManaLevel||state.manaLevel||0);
@@ -399,7 +482,7 @@ if(b.type==='castle'){
 }else{
  cube(g,1.64,1.62,1.58,detail.plaster,0,1.03,0);cube(g,1.78,.15,1.72,detail.mortar,0,1.86,0);roof(g,1.83,1.83,2.36,detail.slate);for(let x of [-.52,.52])windowAt(g,x,1.05,.82);cube(g,.42,.74,.13,detail.darkwood,0,.54,.83);cube(g,.4,.55,.4,detail.mortar,.55,2.17,-.45);roof(g,.5,.5,2.67,detail.copper);
 }
-if(b.type!=='castle')cube(g,1.95,.045,.08,detail.trim,0,.25,1.16);if(b.type!=='castle'){architectureDetail(g,b);emberDetails(g,b)}g.userData.building=b;scene.add(g);objects.push(g)}
+if(b.type!=='castle')cube(g,1.95,.045,.08,detail.trim,0,.25,1.16);if(b.type!=='castle'){architectureDetail(g,b);emberDetails(g,b);royalBuildingDetail(g,b)}g.userData.building=b;scene.add(g);objects.push(g)}
 function clearObjects(){objects.forEach(o=>scene.remove(o));objects=[];walkers.length=0;waterFeatures=[];if(placementPreview){scene.remove(placementPreview);placementPreview=null}}const KINGDOM_SIZE=1536;const worldToCoordinates=(x,z)=>({x:Math.max(0,Math.min(KINGDOM_SIZE,Math.round(x+KINGDOM_SIZE/2))),y:Math.max(0,Math.min(KINGDOM_SIZE,Math.round(z+KINGDOM_SIZE/2)))});const coordinatesToWorld=(x,y)=>({x:x-KINGDOM_SIZE/2,z:y-KINGDOM_SIZE/2});const realm=realmState(state);let HOME_POSITION={x:realm.x-768,z:realm.y-768};const KINGDOM_OBJECTIVES=[{id:'base',name:'Kingdom Base',x:0,z:0,size:80},{id:'fort-1',name:'Kingdom Fort 1',x:-370,z:-570,size:20},{id:'fort-2',name:'Kingdom Fort 2',x:370,z:-570,size:20},{id:'fort-3',name:'Kingdom Fort 3',x:-370,z:570,size:20},{id:'fort-4',name:'Kingdom Fort 4',x:370,z:570,size:20},{id:'fort-5',name:'Kingdom Fort 5',x:-610,z:0,size:20},{id:'fort-6',name:'Kingdom Fort 6',x:610,z:0,size:20}];function inNoShieldZone(x,z){return KINGDOM_OBJECTIVES.find(o=>Math.abs(x-o.x)<o.size/2&&Math.abs(z-o.z)<o.size/2)||null}let selectedWorldTarget=null;function addCastleShield(x,z,radius){
 const cosmetic=shieldCosmetics(state);
 const design=SHIELD_DESIGNS.find(d=>d.id===cosmetic.selectedDesign)||SHIELD_DESIGNS[0];
