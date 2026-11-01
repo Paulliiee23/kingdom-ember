@@ -336,6 +336,45 @@ function emberFortress(parent,level,unified=0,size=1){
   cone(f,.27,.79,crystal,0,keepH+1.15,-.23,6);
   for(const x of [-1,1])for(const z of [-1,1])cone(f,.15,.41,crystal,x,towerH+1.17,z,6);
  }
+ // Royal citadel architectural pass: blue rooflines, gilded caps and glowing windows.
+ // Geometry is decorative only and stays inside the existing building footprint.
+ const azureRoof=new THREE.MeshStandardMaterial({color:ascended?0x226b91:advanced?0x244c85:0x345f88,roughness:.48,metalness:.16});
+ const royalTrim=new THREE.MeshStandardMaterial({color:0xe6c47c,roughness:.34,metalness:.58});
+ const paleStone=new THREE.MeshStandardMaterial({color:0xd8d8d0,roughness:.82});
+ const windowGlow=new THREE.MeshStandardMaterial({color:0x99d9f4,emissive:0x2474aa,emissiveIntensity:.48,roughness:.22});
+ // A crown of slate-blue roofs ties the keep and corner towers together.
+ for(const x of [-1,1])for(const z of [-1,1]){
+  const y=.45+towerH;
+  cone(f,large?.49:.39,large?.76:.55,azureRoof,x,y+.48,z,4);
+  cube(f,.67,.075,.67,royalTrim,x,y+.11,z);
+  cone(f,.10,.28,royalTrim,x,y+.91,z,6);
+  for(const sx of [-1,1]){
+   cube(f,.10,.24,.055,windowGlow,x+sx*.15,.88+towerH*.43,z+Math.sign(z)*.32);
+  }
+ }
+ // Decorative buttresses and ceremonial arches around the central entrance.
+ for(const x of [-.8,.8]){
+  cube(f,.17,.82,.19,paleStone,x,.72,1.13);
+  cube(f,.23,.11,.24,royalTrim,x,1.19,1.13);
+  cone(f,.17,.34,azureRoof,x,1.42,1.13,4);
+ }
+ for(const x of [-.42,.42]){
+  cube(f,.10,.33,.08,windowGlow,x,1.12,1.19);
+  cube(f,.15,.065,.11,royalTrim,x,1.33,1.2);
+ }
+ // Layered keep roof and a tall gold-capped central spire.
+ cube(f,large?1.35:1.08,.09,large?1.3:1.08,royalTrim,0,.51+keepH,-.23);
+ cone(f,large?.91:.74,large?1.04:.79,azureRoof,0,.69+keepH,-.23,4);
+ cube(f,.13,.37,.13,royalTrim,0,keepH+1.22,-.23);
+ cone(f,.16,.38,royalTrim,0,keepH+1.59,-.23,6);
+ // Royal banners are more prominent as the castle grows.
+ if(royal){
+  const bannerMat=new THREE.MeshStandardMaterial({color:advanced?0x55378e:0x315a99,roughness:.8,side:THREE.DoubleSide});
+  for(const x of [-.88,.88]){
+   cube(f,.24,.58,.045,bannerMat,x,1.11,1.2);
+   cube(f,.07,.62,.065,royalTrim,x,1.12,1.24);
+  }
+ }
  f.userData.castleLevel=lv;
  f.userData.unifiedLevel=unified;
  f.userData.castleStyle=stage.name;
