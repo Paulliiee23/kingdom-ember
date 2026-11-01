@@ -202,3 +202,16 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
  #quickActions{bottom:67px!important}
 }
 @media(prefers-reduced-motion:reduce){#bottom button,#activityRail button,#eventRail button{transition:none!important}}
+
+/* Original Kingdom Ember: Castle at Sunset splash artwork.
+   Place the exact PNG at public/images/kingdom-ember-loading.png. */
+#titleScreen {
+ background: linear-gradient(180deg,rgba(8,7,21,.15),rgba(8,7,21,.35)),url('/images/kingdom-ember-loading.png') center center / cover no-repeat,linear-gradient(135deg,#26133d,#a05239) !important;
+}
+#titleScreen > div {
+ background:rgba(12,8,30,.30) !important;
+ backdrop-filter:blur(2px);
+ border-color:rgba(218,174,99,.7) !important;
+}
+#titleScreen #loadTrack {box-shadow:0 0 18px rgba(151,65,245,.8) !important;}
+#titleScreen #loadFill {background:linear-gradient(90deg,#6422aa,#ae51f7,#dfb6ff) !important;}
