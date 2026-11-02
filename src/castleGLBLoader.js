@@ -55,25 +55,7 @@ export function createCastleGLBInstance(level=1){
  const center=fitted.getCenter(new THREE.Vector3());
  castle.position.set(-center.x,.25-fitted.min.y,-center.z);
  castle.userData.assetType='royal-castle-glb-v095';
- // Add tier-exclusive architectural silhouettes; geometry is original.
- if(tier.spires){
-  const ornament=new THREE.Group();
-  const roofMat=new THREE.MeshStandardMaterial({color:tier.roof,roughness:.55,metalness:.14});
-  const goldMat=new THREE.MeshStandardMaterial({color:tier.metal,metalness:.65,roughness:.34});
-  for(const x of [-.75,.75]){
-   for(const z of tier.spires===4?[-.75,.75]:[-.75]){
-    const tower=new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,.55,10),new THREE.MeshStandardMaterial({color:tier.stone,roughness:.9}));
-    tower.position.set(x,2.15,z);
-    const roof=new THREE.Mesh(new THREE.ConeGeometry(.27,tier.spires===4?.72:.52,10),roofMat);
-    roof.position.set(x,2.72,z);
-    const finial=new THREE.Mesh(new THREE.SphereGeometry(.065,8,6),goldMat);
-    finial.position.set(x,tier.spires===4?3.15:3.05,z);
-    ornament.add(tower,roof,finial);
-   }
-  }
-  castle.add(ornament);
- }
- castle.userData.castleTier=tier.name;
+ // Upgrade appearance comes from the loaded mesh materials and size; no runtime castle geometry.\n castle.userData.castleTier=tier.name;
  castle.userData.level=level;
  return castle;
 }
