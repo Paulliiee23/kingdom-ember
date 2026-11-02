@@ -660,9 +660,9 @@ function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*
 if(b.type==='castle'){
  const unified=Number(state.castleUnifiedLevel||state.unifiedLevel||state.castleManaLevel||state.manaLevel||0);
  // New modelled castle asset replaces the old primitive fortress visual.
- // The top five levels use the newly sculpted procedural crown until matching art is shipped.
- // Existing sprite art still takes priority when available.
- const castleAsset=createCastleSprite(level)||(Number(level)>=31?null:createCastleGLBInstance(level));
+ // Levels 31–35 deliberately render the detailed 3D citadel instead of a flat milestone sprite.
+ // Lower levels continue to prefer installed sprite artwork, then the royal GLB.
+ const castleAsset=Number(level)>=31?null:(createCastleSprite(level)||createCastleGLBInstance(level));
  if(castleAsset)g.add(castleAsset);
  else emberFortress(g,level,unified,1);
 }else if(b.type==='farm'){
