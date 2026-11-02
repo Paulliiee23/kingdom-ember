@@ -784,7 +784,7 @@ canvas.addEventListener('pointermove',e=>{
  if(Math.abs(e.clientX-downX)+Math.abs(e.clientY-downY)>8)drag=true;
  if(pointers.size===1){
   if(gesture)return;
-  if(prev.button===2||e.shiftKey)angle+=dx*.008;
+  if((prev.button===2||e.shiftKey)&&view==='world')angle+=dx*.008;
   else pan(dx,dy);
  }else if(pointers.size===2){
   gesture=true;drag=true;
@@ -793,7 +793,7 @@ canvas.addEventListener('pointermove',e=>{
   if(previousPinch)zoom=Math.max(10,Math.min(view==='world'?85:25,zoom+(previousPinch-pair.distance)*(view==='world'?.012:.007)));
   if(previousPinch){
    const delta=Math.atan2(Math.sin(pair.angle-previousTwist),Math.cos(pair.angle-previousTwist));
-   angle+=THREE.MathUtils.clamp(delta,-.055,.055)*.55;
+   if(view==='world')angle+=THREE.MathUtils.clamp(delta,-.055,.055)*.55;
   }
   previousPinch=pair.distance;
   previousTwist=pair.angle;
