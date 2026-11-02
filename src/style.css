@@ -284,3 +284,26 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
 
 /* Original 3D stage viewports for Labyrinth and Tycoon */
 .ember-stage{width:100%;height:clamp(210px,40vh,430px);overflow:hidden;border:2px solid #b48b51;border-radius:14px;background:#1b2343;margin:10px 0 18px;position:relative}.ember-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+
+/* Royal Tycoon and Ember Labyrinth — compact mobile-first play panels */
+.progressive-game{display:grid;gap:14px;padding:4px 0 20px;color:#f4e8d6}
+.progressive-hero{padding:18px;border:1px solid #b68c4c;border-radius:16px;background:linear-gradient(135deg,#34233f,#181a2e 75%);box-shadow:inset 0 1px 0 #ffffff24}
+.progressive-game--labyrinth .progressive-hero{background:linear-gradient(135deg,#263e4a,#1c2034 80%)}
+.progressive-eyebrow{font-size:10px;letter-spacing:2px;color:#f0c987;font-weight:800}
+.progressive-hero h3{margin:9px 0;font-size:23px;color:#ffe1a0}
+.progressive-hero p{margin:0 0 14px;line-height:1.5;color:#d7cbd9}
+.progressive-wallet,.progressive-mode-heading,.progressive-stats{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.progressive-wallet{padding:10px 12px;border-radius:10px;background:#ffffff14}
+.progressive-wallet strong{font-size:21px;color:#ffe6a0}
+.progressive-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.progressive-mode{padding:13px 11px;border:1px solid #6f6b7c;border-radius:13px;background:linear-gradient(#313344,#20212e)}
+.progressive-mode--elite{border-color:#ad79de;background:linear-gradient(#423051,#272039)}
+.progressive-mode-heading{flex-wrap:wrap}.progressive-mode-heading span{font-size:11px;color:#c5b7cc}
+.progressive-prize{margin:16px 0}.progressive-prize small{display:block;color:#cbb9c5}.progressive-prize strong{display:block;font-size:clamp(16px,4vw,24px);color:#ffe2a0;overflow-wrap:anywhere}
+.progressive-stats{flex-wrap:wrap;font-size:11px;color:#c6bfcf;margin-bottom:12px}
+.progressive-mode button{width:100%;min-height:43px;border-radius:9px;font-weight:800}
+.progressive-boss,.progressive-history{border:1px solid #7d6885;border-radius:12px;padding:13px;background:#262435}
+.progressive-boss p{margin:8px 0}.progressive-boss small{color:#bcb5c8}
+.progressive-history summary{cursor:pointer;font-weight:700;color:#f0d6a6}
+.progressive-game .ember-stage{min-height:155px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at center,#443756,#161728)}
+@media(max-width:380px){.progressive-modes{grid-template-columns:1fr}}
