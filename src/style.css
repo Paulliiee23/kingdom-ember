@@ -259,3 +259,25 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
  #quickActions{bottom:calc(61px + var(--hud-safe-bottom))!important}
  #emberOwnerPanel{bottom:calc(60px + var(--hud-safe-bottom))!important}
 }
+
+/* Kingdom Ember visual pass: sculpted title crest and readable progression overlay */
+#titleScreen>div{width:min(760px,94vw);max-height:calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto!important;padding:clamp(14px,3vh,32px)!important;border:2px solid #d9b578!important;box-shadow:0 24px 80px #090615cc,inset 0 0 0 2px #b78a4a55!important}
+#titleScreen h1{font-size:clamp(32px,6.2vw,74px)!important;line-height:1.05!important;letter-spacing:.045em!important;margin:12px 0!important}
+#titleScreen p{margin:12px 0!important}
+.ember-title-crest{height:clamp(64px,16vh,140px);width:clamp(110px,22vw,210px);display:flex;align-items:flex-end;justify-content:center;margin:0 auto 10px;filter:drop-shadow(0 7px 9px #0009)}
+.ember-title-crest span{display:block;position:relative;background:linear-gradient(90deg,#5d6071,#e3d7c0 30%,#a7a4ad 72%,#47495b);border:2px solid #4a4052;box-shadow:inset 0 4px 0 #f7e9ce55}
+.ember-title-tower{width:27%;height:64%;border-radius:4px 4px 0 0}
+.ember-title-keep{width:45%;height:83%;border-radius:5px 5px 0 0;margin:0 -2px}
+.ember-title-crest span:before{content:"";position:absolute;left:-8%;right:-8%;bottom:100%;height:32%;background:linear-gradient(135deg,#532b63,#8d4f9e 60%,#39234e);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.ember-title-keep:after{content:"";position:absolute;bottom:0;left:33%;width:34%;height:39%;border-radius:60% 60% 0 0;background:linear-gradient(90deg,#211929,#5b3641);border:2px solid #57435a;border-bottom:0}
+.castle-benefits-header{display:flex;align-items:center;gap:12px;padding:8px 4px 14px;border-bottom:1px solid #b9986355}
+.castle-benefits-header h3{margin:0 0 4px;color:#ffe0a0;font-size:clamp(17px,2.6vw,25px)}
+.castle-benefits-header p{margin:0;font-size:12px;color:#d4c8b7}
+.castle-benefits-icon{display:grid;place-items:center;flex:none;width:50px;height:50px;border-radius:50%;border:2px solid #d7ad66;background:radial-gradient(circle at 35% 20%,#73548b,#1a2338);font-size:30px}
+.castle-benefits-scroll{max-height:min(54dvh,390px);overflow:auto;border:1px solid #a98b5e88;border-radius:9px;background:#111b2ae8}
+.castle-benefits-table{width:100%;min-width:420px;border-collapse:collapse;font-size:clamp(11px,1.4vw,14px);text-align:center;font-variant-numeric:tabular-nums}
+.castle-benefits-table th{position:sticky;top:0;background:#28374d;color:#ffe2a7;padding:12px 8px;border-bottom:2px solid #ad8551;z-index:1}
+.castle-benefits-table td{padding:9px 8px;border-bottom:1px solid #ffffff12}
+.castle-benefits-table tbody tr:nth-child(even){background:#ffffff0a}
+.castle-benefits-table .castle-current-level{background:#594374!important;color:#fff3d6;font-weight:800;outline:1px solid #b997d5;outline-offset:-1px}
+@media(orientation:landscape) and (max-height:500px){#titleScreen>div{padding:8px 18px!important}#titleScreen h1{font-size:clamp(26px,5vw,55px)!important;margin:6px 0!important}.ember-title-crest{height:56px;width:94px;margin-bottom:3px}#titleScreen p{margin:6px 0!important}#titleScreen button{margin-top:8px!important;padding:9px 25px!important}}
