@@ -729,7 +729,7 @@ function royalCityWalls(){
  }
  scene.add(group);objects.push(group);
 }
-function makeMapFort(g,i){cube(g,2,1.3,2,materials.stone,0,.7,0);cone(g,1.55,1.1,i%2?materials.roof:materials.blue,0,1.9,0)}function updateCamera(){constrainCamera();const coordDisplay=$('worldCoords');if(coordDisplay){coordDisplay.style.display=view==='world'?'block':'none';if(view==='world'){const c=worldToCoordinates(focusX,focusZ);coordDisplay.textContent='K'+realmState(state).kingdom+' · X:'+c.x+' Y:'+c.y}}if(scene.fog){scene.fog.near=view==='world'?1050:72;scene.fog.far=view==='world'?1900:185}const dist=view==='world'?Math.max(25,zoom*2.4):zoom*.82;camera.position.set(focusX+Math.cos(angle)*dist,dist*(view==='world'?1.35:1.18),focusZ+Math.sin(angle)*dist);camera.lookAt(focusX,0,focusZ)}// Visible, animated march markers on the world map. These represent timed simulated expeditions.
+function makeMapFort(g,i){cube(g,2,1.3,2,materials.stone,0,.7,0);cone(g,1.55,1.1,i%2?materials.roof:materials.blue,0,1.9,0)}function updateCamera(){constrainCamera();const coordDisplay=$('worldCoords');if(coordDisplay){coordDisplay.style.display=view==='world'?'block':'none';if(view==='world'){const c=worldToCoordinates(focusX,focusZ);coordDisplay.textContent='K'+realmState(state).kingdom+' · X:'+c.x+' Y:'+c.y}}if(scene.fog){scene.fog.near=view==='world'?1050:72;scene.fog.far=view==='world'?1900:185}const dist=view==='world'?Math.max(25,zoom*1.35):zoom*.82;camera.position.set(focusX+Math.cos(angle)*dist,dist*(view==='world'?.85:.95),focusZ+Math.sin(angle)*dist);camera.lookAt(focusX,0,focusZ)}// Visible, animated march markers on the world map. These represent timed simulated expeditions.
 const marchVisuals=new THREE.Group();scene.add(marchVisuals);
 const marchGeometry=new THREE.ConeGeometry(.46,1.15,4);
 const attackMaterial=new THREE.MeshStandardMaterial({color:0xf2a449,emissive:0x48200b});
@@ -756,8 +756,8 @@ let shieldWasActive=shieldRemaining(state)>0;function render(){requestAnimationF
 const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),hitPoint=new THREE.Vector3();renderer.domElement.addEventListener('pointermove',e=>{if((!placing&&!moving)||view!=='city')return;mouse.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mouse,camera);if(ray.ray.intersectPlane(plane,hitPoint)){const x=Math.round(hitPoint.x/2.8),z=Math.round(hitPoint.z/2.8);if(Math.abs(x)<=4&&Math.abs(z)<=4)previewAt(x,z)}});function tap(e){mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(objects,true);for(let h of hits){let p=h.object;while(p&&!p.userData.building&&!p.userData.plot&&!p.userData.mapFort&&!p.userData.monster&&!p.userData.dummyCastle)p=p.parent;if(p?.userData.building){if(moving){const target=p.userData.building;if(target===moving){msg('Choose a different empty plot');return}msg('That plot is occupied');return}selected=p.userData.building;showPanel('detail');return}if(p?.userData.monster){selectedWorldTarget={...p.userData.targetPosition,type:'hunt',name:p.userData.monsterName,level:p.userData.monsterLevel};showPanel('hunt');return}if(p?.userData.dummyCastle){selectedWorldTarget={...p.userData.targetPosition,type:'dummy',name:DUMMY_CASTLE.name};showPanel('dummyCastle');return}if(p?.userData.mapFort){selectedWorldTarget={...p.userData.targetPosition,type:'attack',name:p.userData.objectiveName};showPanel('battle');return}if(p?.userData.plot&&(placing||moving)){if(moving)moveAt(p.userData.plot.x,p.userData.plot.z);else buildAt(p.userData.plot.x,p.userData.plot.z);return}}}const canvas=renderer.domElement;
 canvas.style.touchAction='none';
 const pointers=new Map();let gesture=false,previousPinch=0;
-function constrainCamera(){const world=view==='world';const half=world?KINGDOM_SIZE/2:160;const dist=world?Math.max(25,zoom*2.4):zoom*.82;const elevation=world?1.35:1.18;const vfov=camera.fov*Math.PI/180;const footprint=dist*(1+elevation)*Math.tan(vfov/2)*Math.max(1,camera.aspect);const margin=Math.min(half-1,Math.max(world?32:14,footprint*1.25));const limit=Math.max(0,half-margin);focusX=THREE.MathUtils.clamp(focusX,-limit,limit);focusZ=THREE.MathUtils.clamp(focusZ,-limit,limit)}const clampFocus=()=>constrainCamera();
-function pan(dx,dy){const scale=(view==='world'?zoom*2.4:zoom)*.0015;focusX+=(-Math.sin(angle)*dx-Math.cos(angle)*dy)*scale;focusZ+=(Math.cos(angle)*dx-Math.sin(angle)*dy)*scale;clampFocus()}
+function constrainCamera(){const world=view==='world';const half=world?KINGDOM_SIZE/2:160;const dist=world?Math.max(25,zoom*2.4):zoom*.82;const elevation=world?.85:.95;const vfov=camera.fov*Math.PI/180;const footprint=dist*(1+elevation)*Math.tan(vfov/2)*Math.max(1,camera.aspect);const margin=Math.min(half-1,Math.max(world?32:14,footprint*1.25));const limit=Math.max(0,half-margin);focusX=THREE.MathUtils.clamp(focusX,-limit,limit);focusZ=THREE.MathUtils.clamp(focusZ,-limit,limit)}const clampFocus=()=>constrainCamera();
+function pan(dx,dy){const scale=(view==='world'?zoom*2.4:zoom)*.00042;focusX+=(-Math.sin(angle)*dx-Math.cos(angle)*dy)*scale;focusZ+=(Math.cos(angle)*dx-Math.sin(angle)*dy)*scale;clampFocus()}
 // Native-style gestures: one finger pans; two fingers twist to rotate and pinch to zoom.
 let previousTwist=0;
 function pointerPair(){
@@ -778,7 +778,7 @@ canvas.addEventListener('pointermove',e=>{
  if(!pointers.has(e.pointerId))return;
  const prev=pointers.get(e.pointerId);
  pointers.set(e.pointerId,{...prev,x:e.clientX,y:e.clientY});
- const dx=e.clientX-prev.x,dy=e.clientY-prev.y;
+ const dx=THREE.MathUtils.clamp(e.clientX-prev.x,-24,24),dy=THREE.MathUtils.clamp(e.clientY-prev.y,-24,24);
  if(Math.abs(e.clientX-downX)+Math.abs(e.clientY-downY)>8)drag=true;
  if(pointers.size===1){
   if(gesture)return;
@@ -788,10 +788,10 @@ canvas.addEventListener('pointermove',e=>{
   gesture=true;drag=true;
   const pair=pointerPair();
   if(!pair)return;
-  if(previousPinch)zoom=Math.max(10,Math.min(view==='world'?500:27,zoom+(previousPinch-pair.distance)*(view==='world'?.045:.018)));
+  if(previousPinch)zoom=Math.max(10,Math.min(view==='world'?85:25,zoom+(previousPinch-pair.distance)*(view==='world'?.012:.007)));
   if(previousPinch){
    const delta=Math.atan2(Math.sin(pair.angle-previousTwist),Math.cos(pair.angle-previousTwist));
-   angle+=delta;
+   angle+=THREE.MathUtils.clamp(delta,-.055,.055)*.55;
   }
   previousPinch=pair.distance;
   previousTwist=pair.angle;
@@ -807,7 +807,7 @@ function finishPointer(e){
 }
 canvas.addEventListener('pointerup',finishPointer);
 canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);resetPair();if(!pointers.size){gesture=false;drag=false}});
-canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(10,Math.min(view==='world'?500:27,zoom+e.deltaY*(view==='world'?.065:.015)))},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(10,Math.min(view==='world'?500:27,zoom+e.deltaY*(view==='world'?.015:.007)))},{passive:false});
 window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;const k=e.key.toLowerCase();const step=1.1;if(k==='w'||k==='arrowup')pan(0,step*30);else if(k==='s'||k==='arrowdown')pan(0,-step*30);else if(k==='a'||k==='arrowleft')pan(step*30,0);else if(k==='d'||k==='arrowright')pan(-step*30,0);else if(k==='home'){focusX=focusZ=0}else return;e.preventDefault()});
 // Original Kingdom Ember castle benefits: saved castle level drives all four values.
 function castleBenefits(level){
