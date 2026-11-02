@@ -26,7 +26,17 @@ export function mountFantasyStages(root=document){
   function mesh(geo,mat,x,y,z){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);scene.add(m);return m}
   function block(x,y,z,w,h,d,mat=stone){return mesh(new THREE.BoxGeometry(w,h,d),mat,x,y,z)}
   function pillar(x,z,h){mesh(new THREE.CylinderGeometry(.38,.46,h,8),stone,x,h/2,z);block(x,h+.13,z,1,.26,1,gold)}
+  // Decorative stage architecture and effects are original to Kingdom Ember.
   const animated=[];
+  let rewardPulse=0;
+  const rewardLight=new THREE.PointLight(0xffcc66,0,12);
+  rewardLight.position.set(0,3,0);scene.add(rewardLight);
+  const onStagePlay=e=>{
+    if(e.detail?.game!==type)return;
+    rewardPulse=1;
+    rewardLight.color.setHex(e.detail?.jackpot?0xffe45c:0x88eeff);
+  };
+  document.addEventListener('ember:stage-play',onStagePlay);
   const route=[];
   const fx=[];
   function ring(x,y,z,r,material){
@@ -51,6 +61,19 @@ export function mountFantasyStages(root=document){
     for(const side of [-1,1])mesh(new THREE.ConeGeometry(.2,.72,6),stone,x+side*1.1,.54,z-1);
    }
    for(const x of [-7,7])for(const z of [-4,4])pillar(x,z,2);
+   // Floating cliffs, glowing gateways and a crystal prize dais.
+   for(let i=0;i<9;i++){
+     const x=-8+i*2,z=5.3+Math.sin(i*.8)*.8;
+     const cliff=mesh(new THREE.DodecahedronGeometry(1.5+i%3*.2,0),dark,x,-1.1,z);
+     cliff.scale.set(1,.65,1.1);
+     mesh(new THREE.ConeGeometry(.4,.9,6),stone,x,.35,z);
+   }
+   const prize=mesh(new THREE.OctahedronGeometry(1.15),crystal,8.5,2,1);
+   animated.push([prize,2]);
+   for(const side of [-1,1]){
+     pillar(8.5+side*1.5,1,3);
+     mesh(new THREE.ConeGeometry(.55,1.7,7),gold,8.5+side*1.5,4,1);
+   }
    const pawn=new THREE.Group();scene.add(pawn);
    const robe=new THREE.Mesh(new THREE.ConeGeometry(.35,.9,9),new THREE.MeshStandardMaterial({color:0xc753bc}));
    robe.position.y=.5;pawn.add(robe);
@@ -61,6 +84,23 @@ export function mountFantasyStages(root=document){
    block(0,-.6,0,17,1,13,dark);
    block(0,-.04,0,15,.2,11,stone);
    for(const x of [-7,7])for(const z of [-5,5])pillar(x,z,5.8);
+   // Temple wall reliefs and a fractured central battle sigil.
+   for(const z of [-5.8,5.8]){
+     block(0,2,z,15,.4,.3,dark);
+     for(let x=-6;x<=6;x+=2){
+       block(x,2.8,z,.65,1.25,.22,gold);
+       mesh(new THREE.ConeGeometry(.38,.8,5),dark,x,3.8,z);
+     }
+   }
+   for(let i=0;i<12;i++){
+     const angle=i*Math.PI/6;
+     const shard=block(Math.cos(angle)*2.3,.11,Math.sin(angle)*2.3,.32,.12,1.15,gold);
+     shard.rotation.y=-angle;
+   }
+   for(const x of [-6,6]){
+     const fire=new THREE.PointLight(0xff8e65,2,7);fire.position.set(x,2,0);scene.add(fire);
+     mesh(new THREE.ConeGeometry(.4,1.2,7),crystal,x,1.5,0);
+   }
    for(const x of [-4,0,4]){pillar(x,-5,4);pillar(x,5,4)}
    for(const z of [-3,0,3]){pillar(-7,z,4);pillar(7,z,4)}
    for(let i=0;i<8;i++){
@@ -142,6 +182,7 @@ export function mountFantasyStages(root=document){
     host.removeEventListener('pointercancel',pointerUp);
     host.removeEventListener('lostpointercapture',pointerUp);
     scene.traverse(o=>{if(o.isMesh){o.geometry?.dispose();for(const m of (Array.isArray(o.material)?o.material:[o.material]))m?.dispose()}});
+    document.removeEventListener('ember:stage-play',onStagePlay);
     renderer.dispose();instances.delete(host);return
    }
    if(t-last>30){
@@ -158,6 +199,8 @@ export function mountFantasyStages(root=document){
       }
     }
     for(const s of fx){s.m.rotation.y=t*.0009;s.m.position.y=s.y+Math.sin(t*.002+s.phase)*.22}
+    rewardPulse=Math.max(0,rewardPulse-.025);
+    rewardLight.intensity=rewardPulse*7;
     renderer.render(scene,camera);last=t;
    }
    requestAnimationFrame(frame);
