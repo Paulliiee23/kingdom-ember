@@ -104,6 +104,42 @@ function drawArt(ctx,type,level){
  }else if(family==='scholar'){
   for(const x of [96,131]){ctx.fillStyle='#d3bb80';ctx.fillRect(x,438,22,50);ctx.fillStyle='#674f8c';ctx.fillRect(x+4,443,14,35);}
  }
+ // Upgrade silhouette changes, not just palette swaps: each stage adds real features.
+ if(castle&&lv>=8){
+  for(const x of [157,339]){
+   block(ctx,x-15,350,30,95,'#c7b9a8','#8f817d','#e6d6be');
+   roof(ctx,x-21,352,39,55,roofColor);
+  }
+ }
+ if(castle&&lv>=15){
+  for(const x of [181,318]){
+   polygon(ctx,[[x-13,335],[x+13,335],[x+13,391],[x-13,391]],'#9c364b','#e4bc74');
+   line(ctx,x,340,x,380,'#e5c37c',4);
+  }
+ }
+ if(castle&&lv>=22){
+  block(ctx,221,186,67,84,'#e4d7c5','#a69b91','#f1e6d8');
+  roof(ctx,211,190,82,73,roofColor);
+  windowPane(ctx,242,224,'#e4bcff');
+ }
+ if(castle&&lv>=29){
+  for(const x of [185,310]){
+   polygon(ctx,[[x-15,206],[x,167],[x+15,206],[x,241]],'#a77be8','#e6c8ff');
+   line(ctx,x,179,x,219,'rgba(255,241,255,.65)',3);
+  }
+ }
+ if(!castle&&lv>=10){
+  // Additional upper-storey dormer for upgraded civic and economic buildings.
+  block(ctx,230,261,63,55,pal[0],pal[1],pal[0]);
+  roof(ctx,219,265,79,58,roofColor);
+  windowPane(ctx,246,281,'#f4d28a');
+ }
+ if(!castle&&lv>=20){
+  for(const x of [left+27,left+width-22]){
+   ctx.fillStyle='#d5b36c';ctx.fillRect(x,top+5,8,120);
+   ctx.fillStyle=roofColor;ctx.fillRect(x-7,top+29,22,56);
+  }
+ }
  // Repeated windows and a legible central door.
  for(const x of [left+36,left+width-61])windowPane(ctx,x,top+57,lv>=15?'#f5d79a':'#89b6c9');
  ctx.fillStyle='#4a3440';ctx.fillRect(left+width/2-19,top+height-68,43,68);
