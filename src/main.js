@@ -821,7 +821,7 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(10,Math.min
 window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;const k=e.key.toLowerCase();const step=1.1;if(k==='w'||k==='arrowup')pan(0,step*30);else if(k==='s'||k==='arrowdown')pan(0,-step*30);else if(k==='a'||k==='arrowleft')pan(step*30,0);else if(k==='d'||k==='arrowright')pan(-step*30,0);else if(k==='home'){focusX=focusZ=0}else return;e.preventDefault()});
 // Original Kingdom Ember castle benefits: saved castle level drives all four values.
 function castleBenefits(level){
- const n=Math.max(1,Math.min(30,Math.floor(Number(level)||1)));
+ const n=Math.max(1,Math.min(35,Math.floor(Number(level)||1)));
  const armySize=n<=4?[1600,4000,8000,12000][n-1]:12000+(n-4)*4500+(n>=17?Math.floor((n-16)/3)*2000:0);
  const heroSlots=n<5?1:n<9?2:n<13?3:n<17?4:5;
  const armyLimit=n<7?1:n<13?2:n<19?3:n<25?4:5;
