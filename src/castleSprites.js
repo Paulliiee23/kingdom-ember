@@ -41,7 +41,10 @@ export function createCastleSprite(level){
  const lv=Math.max(1,Math.min(CASTLE_MAX_LEVEL,Math.floor(Number(level)||1)));
  const key='level-'+lv;
  const fallback=castleSpriteTier(lv);
- const texture=cache.get(key)||cache.get(fallback);
+ // Prefer exact-level art. A milestone image is used only at its matching level;
+ // intermediate levels get their own generated 2.5D illustration.
+ const milestone=CASTLE_MILESTONES.find(t=>t.min===lv);
+ const texture=cache.get(key)||(milestone?cache.get(fallback):null);
  if(!texture){
   // Missing level art falls back to the existing castle model.
   load(key);
