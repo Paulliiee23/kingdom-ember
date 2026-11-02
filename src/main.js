@@ -1,4 +1,5 @@
 import { installAndroidUpdater } from './androidUpdater.js';
+import { observeFantasyStages } from './fantasyStages.js';
 import { preloadRoyalCastle, createCastleGLBInstance } from './castleGLBLoader.js';
 import * as THREE from 'three';import './style.css';import { installOwnerPanel } from './ownerPanel.js';
 import {renderCommunityEvents,bindCommunityEvents} from './communityEvents.js';
@@ -857,3 +858,5 @@ function updateQueue(){const el=$('queue');if(!el)return;const jobs=state.jobs||
 installOwnerPanel({state,save,redraw:drawWorld,refresh:refreshTop,notify:msg});
 
 installAndroidUpdater();
+
+observeFantasyStages();
