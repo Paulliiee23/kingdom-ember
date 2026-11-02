@@ -1,12 +1,38 @@
 // Offline playtest simulation only. No payments, odds claims, or multiplayer jackpot.
 export const BASE_JACKPOT=1000;
-export function jackpotState(state){
+export const ELITE_BASE_JACKPOT=1000000;
+const ELITE_JUMP_NORMAL_THRESHOLD=1000000;
+const ELITE_JUMP_VALUE=10000000;
+const AUTO_GROWTH_INTERVAL_MS=60000;
+const AUTO_GROWTH_NORMAL=25;
+const AUTO_GROWTH_ELITE=250;
+const MAX_OFFLINE_GROWTH_MS=24*60*60*1000;
+function synchronizeElite(p,game){
+ const normal=p.pools[game+':normal'],elite=p.pools[game+':elite'];
+ if(!normal||!elite)return;
+ // Reaching the Normal milestone permanently raises the Elite minimum for this game.
+ if(normal.value>=ELITE_JUMP_NORMAL_THRESHOLD)elite.milestoneUnlocked=true;
+ const floor=elite.milestoneUnlocked?ELITE_JUMP_VALUE:ELITE_BASE_JACKPOT;
+ elite.value=Math.max(floor,Number(elite.value)||0);
+}
+export function jackpotState(state,now=Date.now()){
  const p=state.progressiveGames??={eliteUnlocked:false,pools:{},history:[],bossChests:0};
  p.pools??={};p.history??=[];p.bossChests??=0;
  for(const game of ['labyrinth','tycoon'])for(const mode of ['normal','elite']){
   const key=game+':'+mode;
-  p.pools[key]??={value:BASE_JACKPOT*(mode==='elite'?10:1),spins:0,wins:0};
+  p.pools[key]??={value:mode==='elite'?ELITE_BASE_JACKPOT:BASE_JACKPOT,spins:0,wins:0};
+  const pool=p.pools[key];
+  // Migrate old test saves, which previously started Elite at 10,000.
+  if(mode==='elite')pool.value=Math.max(ELITE_BASE_JACKPOT,Number(pool.value)||0);
+  if(!Number.isFinite(pool.lastGrowthAt))pool.lastGrowthAt=now;
+  const elapsed=Math.max(0,Math.min(MAX_OFFLINE_GROWTH_MS,now-pool.lastGrowthAt));
+  const steps=Math.floor(elapsed/AUTO_GROWTH_INTERVAL_MS);
+  if(steps>0){
+   pool.value+=steps*(mode==='elite'?AUTO_GROWTH_ELITE:AUTO_GROWTH_NORMAL);
+   pool.lastGrowthAt+=steps*AUTO_GROWTH_INTERVAL_MS;
+  }
  }
+ for(const game of ['labyrinth','tycoon'])synchronizeElite(p,game);
  return p;
 }
 export function unlockEliteForTesting(state){jackpotState(state).eliteUnlocked=true}
@@ -19,10 +45,12 @@ export function playProgressive(state,game,mode='normal',random=Math.random){
  state.specialItems[item]--;
  const key=game+':'+mode,pool=p.pools[key],factor=mode==='elite'?10:1;
  pool.spins++;pool.value+=25*factor;
+ synchronizeElite(p,game);
  // Simulated playtest odds, not a real-money product.
  const jackpot=random()<.01;
  const reward=jackpot?pool.value:0;
- if(jackpot){state.resources.gems=(state.resources.gems||0)+reward;pool.value=BASE_JACKPOT*factor;pool.wins++}
+ if(jackpot){state.resources.gems=(state.resources.gems||0)+reward;pool.value=mode==='elite'?(pool.milestoneUnlocked?ELITE_JUMP_VALUE:ELITE_BASE_JACKPOT):BASE_JACKPOT;pool.wins++}
+ synchronizeElite(p,game);
  let bossChests=0;
  if(game==='tycoon'&&random()<.2){
   const roll=random();bossChests=roll<.7?1:roll<.95?2:3;
