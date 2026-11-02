@@ -26,6 +26,16 @@ export function mountFantasyStages(root=document){
   function block(x,y,z,w,h,d,mat=stone){return mesh(new THREE.BoxGeometry(w,h,d),mat,x,y,z)}
   function pillar(x,z,h){mesh(new THREE.CylinderGeometry(.38,.46,h,8),stone,x,h/2,z);block(x,h+.13,z,1,.26,1,gold)}
   const animated=[];
+  const route=[];
+  const fx=[];
+  function ring(x,y,z,r,material){
+    const m=mesh(new THREE.TorusGeometry(r,.06,8,28),material,x,y,z);
+    m.rotation.x=-Math.PI/2;return m;
+  }
+  function sparkle(x,y,z){
+    const m=mesh(new THREE.OctahedronGeometry(.13),crystal,x,y,z);
+    fx.push({m,y,phase:Math.random()*6.28});
+  }
   if(type==='tycoon'){
    for(let i=0;i<12;i++){
     const a=i*.49;
@@ -33,10 +43,19 @@ export function mountFantasyStages(root=document){
     block(x,-.6,z,3.1,1.2,3.1,i%3===0?dark:stone);
     block(x,.08,z,2.8,.18,2.8,stone);
     if(i>0){const prevX=-8+(i-1)*1.5;block((prevX+x)/2,.15,(Math.sin((i-1)*.49)*2.7+z)/2,1.7,.12,.55,gold)}
+    route.push(new THREE.Vector3(x,.2,z));
+    ring(x,.2,z,.7,gold);
+    sparkle(x+.5,1.4,z);
     const p=mesh(new THREE.OctahedronGeometry(.44),crystal,x,1.2,z);animated.push([p,i]);
     for(const side of [-1,1])mesh(new THREE.ConeGeometry(.2,.72,6),stone,x+side*1.1,.54,z-1);
    }
    for(const x of [-7,7])for(const z of [-4,4])pillar(x,z,2);
+   const pawn=new THREE.Group();scene.add(pawn);
+   const robe=new THREE.Mesh(new THREE.ConeGeometry(.35,.9,9),new THREE.MeshStandardMaterial({color:0xc753bc}));
+   robe.position.y=.5;pawn.add(robe);
+   const face=new THREE.Mesh(new THREE.SphereGeometry(.24,12,10),gold);
+   face.position.y=1.06;pawn.add(face);
+   pawn.position.copy(route[0]);animated.push([pawn,0]);
   }else{
    block(0,-.6,0,17,1,13,dark);
    block(0,-.04,0,15,.2,11,stone);
@@ -60,13 +79,44 @@ export function mountFantasyStages(root=document){
     const eye=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),crystal);eye.position.set(s*.36,.8,1.83);boss.add(eye);
    }
    animated.push([boss,0]);
+   for(let i=0;i<3;i++){
+     const hero=new THREE.Group();scene.add(hero);
+     const coat=new THREE.Mesh(new THREE.CylinderGeometry(.24,.4,.95,8),new THREE.MeshStandardMaterial({color:[0x5778c4,0xba5684,0x5caa88][i]}));
+     coat.position.y=.5;hero.add(coat);
+     const face=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),gold);
+     face.position.y=1.12;hero.add(face);
+     const weapon=new THREE.Mesh(new THREE.BoxGeometry(.07,1.25,.07),gold);
+     weapon.position.set(.35,.9,-.12);hero.add(weapon);
+     hero.position.set((i-1)*1.5,.15,3.4+Math.abs(i-1)*.4);
+     animated.push([hero,i+2]);
+   }
+   for(const x of [-5.5,5.5])for(const z of [-3.8,3.8]){ring(x,.15,z,.75,gold);sparkle(x,1.3,z)}
   }
   let active=true,last=0;
   const observer=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(w&&h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}});observer.observe(host);
   function frame(t){
    if(!active)return;
-   if(!host.isConnected){active=false;observer.disconnect();renderer.dispose();return}
-   if(t-last>30){for(const [m,i] of animated){m.rotation.y=t*.0003+i;m.position.y=(type==='tycoon'?1.2: m.type==='Group'?.7:1.1)+Math.sin(t*.0015+i)*.12}renderer.render(scene,camera);last=t}
+   if(!host.isConnected){
+    active=false;observer.disconnect();
+    scene.traverse(o=>{if(o.isMesh){o.geometry?.dispose();for(const m of (Array.isArray(o.material)?o.material:[o.material]))m?.dispose()}});
+    renderer.dispose();instances.delete(host);return
+   }
+   if(t-last>30){
+    for(const [m,i] of animated){
+      if(m.type==='Group'&&type==='tycoon'&&route.length>1){
+        const u=(t*.00012)%(route.length-1),j=Math.floor(u);
+        m.position.lerpVectors(route[j],route[j+1],u-j);
+        m.position.y=.2+Math.sin(t*.004)*.08;
+      }else if(m.type==='Group'){
+        m.position.y=(i===0?.7:.15)+Math.sin(t*.0015+i)*.08;
+      }else{
+        m.rotation.y=t*.0003+i;
+        m.position.y=1.1+Math.sin(t*.0015+i)*.12;
+      }
+    }
+    for(const s of fx){s.m.rotation.y=t*.0009;s.m.position.y=s.y+Math.sin(t*.002+s.phase)*.22}
+    renderer.render(scene,camera);last=t;
+   }
    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);instances.set(host,{renderer});
