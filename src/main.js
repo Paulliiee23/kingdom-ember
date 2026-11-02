@@ -834,7 +834,7 @@ const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();const plane=new THREE.
 canvas.style.touchAction='none';
 const pointers=new Map();let gesture=false,previousPinch=0;
 function constrainCamera(){const world=view==='world';const half=world?KINGDOM_SIZE/2:160;const dist=world?Math.max(25,zoom*2.4):zoom*.82;const elevation=world?.85:.95;const vfov=camera.fov*Math.PI/180;const footprint=dist*(1+elevation)*Math.tan(vfov/2)*Math.max(1,camera.aspect);const margin=Math.min(half-1,Math.max(world?32:14,footprint*1.25));const limit=Math.max(0,half-margin);focusX=THREE.MathUtils.clamp(focusX,-limit,limit);focusZ=THREE.MathUtils.clamp(focusZ,-limit,limit)}const clampFocus=()=>constrainCamera();
-function pan(dx,dy){const scale=(view==='world'?zoom*2.4:zoom)*.00042;const a=Math.PI/4;focusX+=(-Math.sin(a)*dx-Math.cos(a)*dy)*scale;focusZ+=(Math.cos(a)*dx-Math.sin(a)*dy)*scale;clampFocus()}
+function pan(dx,dy){const scale=(view==='world'?zoom*2.4:zoom)*.00085;const a=Math.PI/4;focusX+=(-Math.sin(a)*dx-Math.cos(a)*dy)*scale;focusZ+=(Math.cos(a)*dx-Math.sin(a)*dy)*scale;clampFocus()}
 // Native-style gestures: one finger pans; two fingers twist to rotate and pinch to zoom.
 let previousTwist=0;
 function pointerPair(){
