@@ -146,9 +146,10 @@ export function createIsometricArtwork(type,level=1,{width=2.6,height=3.4}={}){
   texture.generateMipmaps=true;texture.minFilter=THREE.LinearMipmapLinearFilter;
   cache.set(key,texture);
  }
- const mat=new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:.08,depthWrite:false,side:THREE.DoubleSide});
- const mesh=new THREE.Mesh(new THREE.PlaneGeometry(width,height),mat);
- mesh.rotation.y=Math.PI/4;mesh.position.y=height/2+.12;mesh.renderOrder=4;
+ // Sprite faces the camera when the player rotates the isometric view.
+ const mat=new THREE.SpriteMaterial({map:texture,transparent:true,alphaTest:.08,depthWrite:false});
+ const mesh=new THREE.Sprite(mat);
+ mesh.scale.set(width,height,1);mesh.position.y=height/2+.12;mesh.renderOrder=4;
  mesh.userData.ember2D=true;mesh.userData.artKey=key;
  return mesh;
 }
