@@ -22,11 +22,9 @@ export function loadBuildingSprite(key){
 }
 export function createBuildingSprite(key,{width=2.55,height=3.2}={}){
  const texture=cache.get(key);if(!texture)return null;
- const material=new THREE.MeshBasicMaterial({
-  map:texture,transparent:true,alphaTest:.08,depthWrite:false,side:THREE.DoubleSide
- });
- const sprite=new THREE.Mesh(new THREE.PlaneGeometry(width,height),material);
- sprite.rotation.y=Math.PI/4;
+ const material=new THREE.SpriteMaterial({map:texture,transparent:true,alphaTest:.08,depthWrite:false});
+ const sprite=new THREE.Sprite(material);
+ sprite.scale.set(width,height,1);
  sprite.position.y=height/2+.12;
  sprite.renderOrder=4;
  sprite.userData.ember2D=true;
