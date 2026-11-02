@@ -330,3 +330,21 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
 .ember-play-use{flex:1;display:flex;flex-direction:column;gap:6px;align-items:stretch}.ember-play-mode-info{text-align:center;font-size:11px;color:#bcd8f5}.ember-play-use-button{min-height:65px!important;background:linear-gradient(#ffe4a2,#c58b30)!important;border:3px solid #f9d88c!important;color:#382317!important;border-radius:10px!important;font-size:22px!important;font-weight:900!important;box-shadow:0 5px 0 #74501f}.ember-play-use-button span{display:inline-flex;align-items:center;gap:3px;font-size:15px}.ember-play-use-button img{width:23px;height:23px}.ember-play-auto{font-size:13px;background:#704e37!important;color:#fff1db!important;border-radius:7px!important;min-height:34px}
 .ember-play-footer{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#bdcbe7}.ember-play-unlock{align-self:center;font-size:12px}.ember-play-details{padding:10px;background:#192343;border:1px solid #63799f;border-radius:9px;font-size:12px}.ember-play-details summary{cursor:pointer;color:#bfe4ff;font-weight:700}
 @media(max-width:480px){.ember-play-world{min-height:275px}.ember-play-controls{flex-direction:column;align-items:stretch}.ember-play-mode-picker,.ember-play-use{width:100%}.ember-play-jackpot strong{font-size:19px}.ember-play-treasure{font-size:50px}.ember-play-screen{min-height:0}}
+
+/* City HUD refresh: reclaim space for the kingdom on landscape phones. */
+@media (orientation:landscape) and (max-height:650px){
+ #top{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));top:max(5px,env(safe-area-inset-top));padding:5px 9px!important;gap:5px!important;border:1px solid #d0b17b8a;border-radius:12px;box-shadow:0 5px 18px #0008;flex-wrap:nowrap!important;width:auto;max-width:calc(100% - 16px);min-height:45px}
+ #brand{font-size:12px!important;letter-spacing:.02em!important;white-space:nowrap}
+ #top .res,.res{font-size:11px!important;padding:5px 7px!important;white-space:nowrap}
+ #bottom{left:50%;right:auto;transform:translateX(-50%);bottom:max(5px,env(safe-area-inset-bottom));width:max-content;max-width:min(94vw,850px);padding:5px 8px!important;border:1px solid #c6a778;border-radius:17px;gap:4px!important;background:linear-gradient(180deg,#273448e8,#111b2be8);box-shadow:0 4px 20px #0009;scrollbar-width:none}
+ #bottom::-webkit-scrollbar{display:none}
+ #bottom button{min-width:70px!important;min-height:47px;padding:5px 9px!important;font-size:11px!important;line-height:1.2}
+ #hint{bottom:65px;max-width:48vw;font-size:10px;padding:5px 8px}
+ #panel{top:max(58px,calc(env(safe-area-inset-top) + 52px));max-height:calc(100dvh - 125px);right:max(10px,env(safe-area-inset-right));width:min(380px,40vw);padding:12px}
+ #visualTag{top:60px!important}
+}
+@media (orientation:landscape) and (max-height:430px){
+ #bottom button{min-width:60px!important;min-height:39px;font-size:10px!important}
+ #top{min-height:38px}
+ #panel{top:48px;max-height:calc(100dvh - 100px)}
+}
