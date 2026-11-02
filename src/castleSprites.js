@@ -52,15 +52,13 @@ export function createCastleSprite(level){
   return null;
  }
  if(!cache.has(key))load(key);
- const material=new THREE.MeshBasicMaterial({
-  map:texture,transparent:true,alphaTest:.08,side:THREE.DoubleSide,depthWrite:false
- });
+ const material=new THREE.SpriteMaterial({map:texture,transparent:true,alphaTest:.08,depthWrite:false});
  // Preserve source-image proportions so artwork never stretches across upgrades.
  const image=texture.image;
  const aspect=image?.width&&image?.height?image.width/image.height:3.7/4.1;
  const height=4.1;
- const mesh=new THREE.Mesh(new THREE.PlaneGeometry(height*aspect,height),material);
- mesh.rotation.y=Math.PI/4;
+ const mesh=new THREE.Sprite(material);
+ mesh.scale.set(height*aspect,height,1);
  mesh.position.set(0,2.05,0);
  mesh.renderOrder=5;
  mesh.userData.isCastleSprite=true;
