@@ -1,36 +1,61 @@
 import * as THREE from 'three';
 
-// Fixed-angle 2.5D castle: artwork is a transparent isometric sprite on a depth-tested plane.
-// Each tier can supply a separate PNG/WebP. A GLB remains the fallback until art is approved.
-const tiers=[{min:25,key:'amethyst'},{min:17,key:'red'},{min:9,key:'timber'},{min:1,key:'frontier'}];
+// One artwork slot per castle level. When individual level art is not ready,
+// use the matching milestone illustration; GLB is a last-resort fallback.
+export const CASTLE_MAX_LEVEL=35;
+export const CASTLE_MILESTONES=[
+ {min:35,key:'level-35',name:'Amethyst Citadel'},
+ {min:29,key:'amethyst',name:'Amethyst Ascent'},
+ {min:22,key:'royal',name:'Royal Citadel'},
+ {min:15,key:'red',name:'Red Stronghold'},
+ {min:8,key:'timber',name:'Timber Bastion'},
+ {min:1,key:'frontier',name:'Frontier Fort'}
+];
 const loader=new THREE.TextureLoader();
 const cache=new Map();
+const missing=new Set();
+const pending=new Map();
+function load(key){
+ if(cache.has(key))return Promise.resolve(cache.get(key));
+ if(missing.has(key))return Promise.resolve(null);
+ if(pending.has(key))return pending.get(key);
+ const promise=loader.loadAsync('/art/castles/'+key+'.webp').then(texture=>{
+  texture.colorSpace=THREE.SRGBColorSpace;
+  texture.anisotropy=4;
+  cache.set(key,texture);pending.delete(key);return texture;
+ }).catch(()=>{missing.add(key);pending.delete(key);return null});
+ pending.set(key,promise);return promise;
+}
 export function castleSpriteTier(level){
- return tiers.find(t=>Number(level)>=t.min)?.key||'frontier';
+ const lv=Math.max(1,Math.min(CASTLE_MAX_LEVEL,Math.floor(Number(level)||1)));
+ return CASTLE_MILESTONES.find(t=>lv>=t.min)?.key||'frontier';
 }
 export async function preloadCastleSprites(){
- const results=await Promise.all(tiers.map(async t=>{
-  const url='/art/castles/'+t.key+'.webp';
-  try{
-   const texture=await loader.loadAsync(url);
-   texture.colorSpace=THREE.SRGBColorSpace;
-   texture.anisotropy=4;
-   cache.set(t.key,texture);
-   return t.key;
-  }catch{return null}
- }));
- return results.filter(Boolean);
+ // Milestones first; per-level artwork can stream in as the player upgrades.
+ return (await Promise.all(CASTLE_MILESTONES.map(t=>load(t.key)))).filter(Boolean);
 }
 export function createCastleSprite(level){
- const texture=cache.get(castleSpriteTier(level));
- if(!texture)return null;
- const material=new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:.08,side:THREE.DoubleSide,depthWrite:false});
+ const lv=Math.max(1,Math.min(CASTLE_MAX_LEVEL,Math.floor(Number(level)||1)));
+ const key='level-'+lv;
+ const fallback=castleSpriteTier(lv);
+ const texture=cache.get(key)||cache.get(fallback);
+ if(!texture){
+  // Trigger a background load for this level. Existing geometry remains visible
+  // until the next world redraw, avoiding broken invisible castles.
+  load(key);
+  return null;
+ }
+ if(!cache.has(key))load(key);
+ const material=new THREE.MeshBasicMaterial({
+  map:texture,transparent:true,alphaTest:.08,side:THREE.DoubleSide,depthWrite:false
+ });
  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(3.7,4.1),material);
- // Sprite faces the fixed city camera, but stays anchored to its plot.
  mesh.rotation.y=Math.PI/4;
  mesh.position.set(0,2.05,0);
  mesh.renderOrder=5;
  mesh.userData.isCastleSprite=true;
+ mesh.userData.castleLevel=lv;
+ mesh.userData.artKey=cache.has(key)?key:fallback;
  return mesh;
 }
-export function castleSpriteStatus(){return tiers.map(t=>({tier:t.key,loaded:cache.has(t.key)}))}
+export function castleSpriteStatus(){return CASTLE_MILESTONES.map(t=>({tier:t.key,loaded:cache.has(t.key)}))}
