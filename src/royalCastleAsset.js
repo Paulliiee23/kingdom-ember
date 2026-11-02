@@ -4,9 +4,12 @@ import * as THREE from 'three';
 // recessed archway, stone courses and glazed windows. No external image assets.
 export function createRoyalCastleAsset(level=1){
  const root=new THREE.Group();
- const stone=new THREE.MeshStandardMaterial({color:0xd6d0c1,roughness:.91});
+ const lv=Math.max(1,Math.floor(Number(level)||1));
+ const roofColor=lv>=25?0x612a86:lv>=20?0x742c72:lv>=15?0x8c4532:lv>=10?0x315b79:lv>=5?0x345c75:0x28578b;
+ const stoneColor=lv>=25?0xf0e5d4:lv>=20?0xe3d7c8:lv>=15?0xd3c4b2:lv>=10?0xc5c2b8:lv>=5?0xbdb8ac:0xd6d0c1;
+ const stone=new THREE.MeshStandardMaterial({color:stoneColor,roughness:.91});
  const darkStone=new THREE.MeshStandardMaterial({color:0x8d8a86,roughness:.96});
- const roof=new THREE.MeshStandardMaterial({color:0x28578b,roughness:.52,metalness:.12,side:THREE.DoubleSide});
+ const roof=new THREE.MeshStandardMaterial({color:roofColor,roughness:.52,metalness:.12,side:THREE.DoubleSide});
  const gold=new THREE.MeshStandardMaterial({color:0xdcb76c,metalness:.62,roughness:.34});
  const glass=new THREE.MeshStandardMaterial({color:0x79c4e6,emissive:0x164a73,emissiveIntensity:.5,roughness:.19});
  const door=new THREE.MeshStandardMaterial({color:0x50362b,roughness:.82});
@@ -64,7 +67,7 @@ export function createRoyalCastleAsset(level=1){
  // v0.9.5 architectural detailing: perimeter masonry, reinforced gatehouse,
  // carved buttresses, roof ribs, heraldry and layered tower silhouettes.
  const mortar=new THREE.MeshStandardMaterial({color:0xb2ab9e,roughness:1});
- const slate=new THREE.MeshStandardMaterial({color:0x183b65,roughness:.77,metalness:.03});
+ const slate=new THREE.MeshStandardMaterial({color:roofColor,roughness:.77,metalness:.03});
  const brass=new THREE.MeshStandardMaterial({color:0xa98239,roughness:.48,metalness:.53});
  const banner=new THREE.MeshStandardMaterial({color:0x5b278d,roughness:.88,side:THREE.DoubleSide});
  const iron=new THREE.MeshStandardMaterial({color:0x343b46,roughness:.6,metalness:.65});
@@ -136,6 +139,19 @@ export function createRoyalCastleAsset(level=1){
   add(new THREE.SphereGeometry(.055,8,6),gold,x,3.27,-.22);
  }
 
+ if(lv>=15){
+  const royalRoof=new THREE.MeshStandardMaterial({color:roofColor,roughness:.48,metalness:.18});
+  for(const x of [-.56,.56]){
+   const turret=add(new THREE.CylinderGeometry(.16,.19,.75,10),stone,x,3.05,-.22);
+   const cap=add(new THREE.ConeGeometry(.29,lv>=20?.9:.65,10),royalRoof,x,3.78,-.22);
+   turret.castShadow=cap.castShadow=true;
+  }
+ }
+ if(lv>=25){
+  const crown=add(new THREE.OctahedronGeometry(.3),gold,0,4.7,-.22);
+  crown.rotation.y=Math.PI/4;
+ }
+ root.userData.castleTier=lv>=25?'Imperial':lv>=20?'Royal':lv>=15?'Citadel':lv>=10?'Fortress':lv>=5?'Stronghold':'Keep';
  root.userData.assetType='royal-castle-mesh-v095-detailed';
  root.userData.level=level;
  return root;
