@@ -32,7 +32,7 @@ export function castleSpriteTier(level){
 }
 export async function preloadCastleSprites(){
  // Milestones first; per-level artwork can stream in as the player upgrades.
- return (await Promise.all(CASTLE_MILESTONES.map(t=>load(t.key)))).filter(Boolean);
+ return (await Promise.all(Array.from({length:CASTLE_MAX_LEVEL},(_,i)=>load('level-'+(i+1))))).filter(Boolean);
 }
 export function createCastleSprite(level){
  const lv=Math.max(1,Math.min(CASTLE_MAX_LEVEL,Math.floor(Number(level)||1)));
@@ -40,8 +40,7 @@ export function createCastleSprite(level){
  const fallback=castleSpriteTier(lv);
  const texture=cache.get(key)||cache.get(fallback);
  if(!texture){
-  // Trigger a background load for this level. Existing geometry remains visible
-  // until the next world redraw, avoiding broken invisible castles.
+  // Missing level art falls back to the existing castle model.
   load(key);
   return null;
  }
