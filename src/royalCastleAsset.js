@@ -151,6 +151,68 @@ export function createRoyalCastleAsset(level=1){
   const crown=add(new THREE.OctahedronGeometry(.3),gold,0,4.7,-.22);
   crown.rotation.y=Math.PI/4;
  }
+ // Finished tier-specific 3D architecture, not a flat recolour.
+ const accent=new THREE.MeshStandardMaterial({color:lv>=20?0xd9ad59:0x947b5c,metalness:.35,roughness:.48});
+ const slateRidge=new THREE.MeshStandardMaterial({color:roofColor,roughness:.63,metalness:.08});
+ // Front entrance: structural stairs, raised door surround, carved lintel.
+ for(let i=0;i<3;i++)box(.94+i*.17,.085,.19,darkStone,0,.12+i*.07,1.34+i*.15);
+ box(.85,.12,.16,accent,0,1.45,.87);
+ for(const x of [-.42,.42]){box(.13,1.35,.19,stone,x,.84,.88);box(.19,.12,.25,accent,x,1.57,.88)}
+ // Stone courses and buttresses visually grow with the castle.
+ for(const x of [-1.08,1.08])for(const z of [-.95,.95]){
+  box(.23,lv>=10?1.32:.78,.25,darkStone,x,lv>=10?.87:.58,z);
+  box(.32,.13,.32,accent,x,lv>=10?1.57:1.01,z);
+ }
+ // Real raised roof ribs, rather than a single smooth triangular surface.
+ for(const z of [-1.01,.59]){
+  const rib=add(new THREE.CylinderGeometry(.045,.045,2.04,7),accent,0,3.49,z);
+  rib.rotation.z=Math.PI/2;
+ }
+ for(const x of [-.8,.8]){
+  const ridge=add(new THREE.BoxGeometry(.045,1.2,.07),slateRidge,x*.64,3.06,-.21);
+  ridge.rotation.z=x<0?-.72:.72;
+ }
+ // Stone-framed, glowing upper keep windows.
+ for(const x of [-.42,.42]){
+  box(.25,.47,.09,darkStone,x,2.03,.46);
+  const pane=add(new THREE.PlaneGeometry(.16,.33),glass,x,2.04,.515);
+  pane.material.side=THREE.DoubleSide;
+  box(.3,.075,.12,accent,x,2.31,.52);
+ }
+ if(lv>=5){
+  // Stronghold: corner watch posts and enlarged defensive wall silhouette.
+  for(const x of [-1.2,1.2])for(const z of [-1.12,1.12]){
+   add(new THREE.CylinderGeometry(.24,.28,1.15,12),stone,x,.82,z);
+   add(new THREE.ConeGeometry(.36,.58,12),slateRidge,x,1.69,z);
+  }
+ }
+ if(lv>=10){
+  // Fortress: taller gatehouse, crenellated parapet and outer balconies.
+  box(1.08,.45,.43,stone,0,1.74,1.03);
+  box(1.18,.12,.5,accent,0,2.04,1.03);
+  for(let i=-3;i<=3;i++)box(.15,.2,.19,stone,i*.16,2.18,1.25);
+  for(const x of [-.79,.79])box(.32,.13,.58,accent,x,2.23,.3);
+ }
+ if(lv>=15){
+  // Citadel: fortified upper keep and a second roof silhouette.
+  box(1.05,.72,.94,stone,0,3.01,-.22);
+  add(new THREE.ConeGeometry(.8,.74,4),slateRidge,0,3.75,-.22).rotation.y=Math.PI/4;
+  for(const x of [-.43,.43])box(.13,.7,.13,accent,x,3.01,.29);
+ }
+ if(lv>=20){
+  // Royal: four corner crowns and prominent heraldic finials.
+  for(const x of [-1.16,1.16])for(const z of [-1.1,1.1]){
+   add(new THREE.ConeGeometry(.21,.6,8),slateRidge,x,2.26,z);
+   add(new THREE.SphereGeometry(.09,8,6),gold,x,2.62,z);
+  }
+  box(1.3,.14,.18,gold,0,2.46,.66);
+ }
+ if(lv>=25){
+  // Imperial: raised crown tower and violet-and-gold upper pinnacle.
+  add(new THREE.CylinderGeometry(.29,.36,.7,12),stone,0,4.2,-.22);
+  add(new THREE.ConeGeometry(.43,.9,12),slateRidge,0,5.0,-.22);
+  add(new THREE.SphereGeometry(.12,10,8),gold,0,5.51,-.22);
+ }
  root.userData.castleTier=lv>=25?'Imperial':lv>=20?'Royal':lv>=15?'Citadel':lv>=10?'Fortress':lv>=5?'Stronghold':'Keep';
  root.userData.assetType='royal-castle-mesh-v095-detailed';
  root.userData.level=level;
