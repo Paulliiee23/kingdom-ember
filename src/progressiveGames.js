@@ -35,31 +35,30 @@ export function playProgressive(state,game,mode='normal',random=Math.random){
 }
 export function progressivePanel(state,game){
  const p=jackpotState(state),lab=game==='labyrinth',item=lab?'labyrinthKeys':'tycoonTokens';
- const title=lab?'Ember Labyrinth':'Royal Tycoon';
- const count=state.specialItems?.[item]||0;
- const history=p.history.filter(h=>h.game===game).slice(0,5);
+ const title=lab?'Ember Labyrinth':'Royal Tycoon',count=state.specialItems?.[item]||0;
  const n=x=>Number(x||0).toLocaleString();
- const tokenIcon='<img class="kingdom-currency-icon" src="/art/ui/kingdom_ember_token.svg" alt="Token" onerror="this.replaceWith(document.createTextNode(\'🎟️\'))">';
- const starIcon='<img class="kingdom-currency-icon" src="/art/ui/kingdom_ember_star.svg" alt="Star" onerror="this.replaceWith(document.createTextNode(\'⭐\'))">';
- return `<section class="progressive-game progressive-game--${game}" aria-label="${title}">
- <div class="progressive-hero">
-  <div class="progressive-eyebrow">${lab?'EXPLORE · SURVIVE · DISCOVER':'BUILD · COLLECT · WIN'}</div>
-  <h3>${lab?'🌀':'🎲'} ${title}</h3>
-  <p>${lab?'Enter the ancient chambers and uncover the Ember treasury.':'Run your royal enterprise and uncover treasure from the Tycoon Boss.'}</p>
-  <div class="progressive-wallet"><span>${lab?starIcon:tokenIcon} Available ${lab?'keys':'tokens'}</span><strong>${n(count)}</strong></div>
- </div>
- <div class="ember-stage" data-ember-stage="${game}" aria-label="3D ${game} environment"></div>
- <div class="progressive-modes">${['normal','elite'].map(mode=>{
- const elite=mode==='elite',pool=p.pools[game+':'+mode],locked=elite&&!p.eliteUnlocked;
- return `<div class="progressive-mode ${elite?'progressive-mode--elite':''}">
- <div class="progressive-mode-heading"><strong>${elite?'💎 Elite':'⚔️ Normal'}</strong><span>${elite?'10× rewards':'Standard rewards'}</span></div>
- <div class="progressive-prize"><small>Current gem jackpot</small><strong>💎 ${n(pool.value)}</strong></div>
- <div class="progressive-stats"><span>Plays: ${n(pool.spins)}</span><span>Jackpots won: ${n(pool.wins)}</span></div>
- <button data-progressive-mode="${mode}" ${locked||count<1?'disabled':''}>${locked?'🔒 Elite locked':count<1?'Need 1 '+(lab?'key':'token'):'▶ Play '+(elite?'Elite':'Normal')}</button>
- </div>`}).join('')}</div>
- ${!p.eliteUnlocked?'<button id="testEliteUnlock">🔓 Unlock Elite for free playtesting</button>':'<p>💎 Elite mode unlocked</p>'}
- ${!lab?'<div class="progressive-boss"><strong>👑 Tycoon Boss vault</strong><p>Boss gem chests collected: '+n(p.bossChests)+'</p><small>Each play has a 20% chance to award 1–3 boss chests.</small></div>':'<div class="progressive-boss"><strong>🗝️ Labyrinth expedition</strong><p>Spend a key to claim gold and seek the progressive gem jackpot.</p></div>'}
- <details class="progressive-history"><summary>Recent expeditions and rewards</summary>${history.length?history.map(h=>'<p>'+(h.mode==='elite'?'💎 Elite':'⚔️ Normal')+' · '+(h.jackpot?'Jackpot '+n(h.jackpot)+' gems':lab?'250 gold base reward':'200 stone base reward')+(h.bossChests?' · '+h.bossChests+' boss chests':'')+'</p>').join(''):'<p>No plays yet. Your history will appear here.</p>'}</details>
- <p class="muted">Offline simulation only. No real-money purchases. Jackpot chance: 1% per play; pools increase by 25 gems (Normal) or 250 gems (Elite).</p>
+ const icon=lab?'/art/ui/kingdom_ember_star.svg':'/art/ui/kingdom_ember_token.svg';
+ const history=p.history.filter(h=>h.game===game).slice(0,4);
+ return `<section class="ember-play-screen ${lab?'ember-play-lab':'ember-play-tycoon'}" data-ember-game="${game}" data-active-mode="normal" aria-label="${title}">
+  <header class="ember-play-top"><div><span class="ember-play-subtitle">${lab?'ANCIENT RUINS':'ROYAL TREASURE PATH'}</span><h3>${title}</h3></div><div class="ember-play-balance"><img src="${icon}" alt=""><strong>${n(count)}</strong></div></header>
+  <div class="ember-play-world">
+   <div class="ember-play-landscape">
+    <div class="ember-play-moon"></div>
+    <div class="ember-play-cliff ember-play-cliff-left"></div><div class="ember-play-cliff ember-play-cliff-right"></div>
+    <div class="ember-play-path"></div>
+    <div class="ember-play-destination">${lab?'🐉':'💠'}</div>
+    <div class="ember-play-avatar">${lab?'⚔️':'👑'}</div>
+    <div class="ember-play-treasure">🧰<span>💎</span></div>
+    <div class="ember-play-stage" data-ember-stage="${game}" aria-label="${game} animated stage"></div>
+   </div>
+   <div class="ember-play-jackpot"><span>💎 PROGRESSIVE JACKPOT</span><strong data-jackpot-value>${n(p.pools[game+':normal'].value)}</strong></div>
+  </div>
+  <div class="ember-play-controls">
+   <div class="ember-play-mode-picker" role="group" aria-label="Play mode"><button type="button" data-ember-select-mode="normal" class="is-active" aria-pressed="true">Normal</button><button type="button" data-ember-select-mode="elite" aria-pressed="false" ${!p.eliteUnlocked?'disabled':''}>Elite ${p.eliteUnlocked?'':'🔒'}</button></div>
+   <div class="ember-play-use"><div class="ember-play-mode-info" data-ember-mode-info>Normal · 1 ${lab?'star':'token'} per use</div><button type="button" class="ember-play-use-button" data-progressive-mode="normal" ${count<1?'disabled':''}>USE <span><img src="${icon}" alt=""> 1</span></button><button type="button" class="ember-play-auto" data-ember-auto>Auto Use ×3</button></div>
+  </div>
+  <div class="ember-play-footer"><span>${lab?'Explore the ruins and defeat the boss':'Advance along the treasure path'}</span><span>Offline playtest · no purchases</span></div>
+  ${!p.eliteUnlocked?'<button type="button" id="testEliteUnlock" class="ember-play-unlock">Unlock Elite (free testing)</button>':''}
+  <details class="ember-play-details"><summary>Rewards, odds and recent plays</summary><p>1% simulated jackpot chance per use. ${lab?'Base reward: 250 gold.':'Base reward: 200 stone. Boss chance: 20%.'} Elite rewards are 10×.</p><p>Normal jackpot: ${n(p.pools[game+':normal'].value)} · Elite jackpot: ${n(p.pools[game+':elite'].value)}</p>${history.length?history.map(h=>'<p>'+(h.mode==='elite'?'Elite':'Normal')+' · '+(h.jackpot?'💎 '+n(h.jackpot):'Standard reward')+'</p>').join(''):'<p>No plays yet.</p>'}</details>
  </section>`;
 }
