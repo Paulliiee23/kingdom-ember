@@ -39,19 +39,21 @@ export function progressivePanel(state,game){
  const count=state.specialItems?.[item]||0;
  const history=p.history.filter(h=>h.game===game).slice(0,5);
  const n=x=>Number(x||0).toLocaleString();
+ const tokenIcon='<img class="kingdom-currency-icon" src="/art/ui/kingdom_ember_token.png" alt="Token" onerror="this.replaceWith(document.createTextNode(\'🎟️\'))">';
+ const starIcon='<img class="kingdom-currency-icon" src="/art/ui/kingdom_ember_star.png" alt="Star" onerror="this.replaceWith(document.createTextNode(\'⭐\'))">';
  return `<section class="progressive-game progressive-game--${game}" aria-label="${title}">
  <div class="progressive-hero">
   <div class="progressive-eyebrow">${lab?'EXPLORE · SURVIVE · DISCOVER':'BUILD · COLLECT · WIN'}</div>
   <h3>${lab?'🌀':'🎲'} ${title}</h3>
   <p>${lab?'Enter the ancient chambers and uncover the Ember treasury.':'Run your royal enterprise and uncover treasure from the Tycoon Boss.'}</p>
-  <div class="progressive-wallet"><span>🎟️ Available ${lab?'keys':'tokens'}</span><strong>${n(count)}</strong></div>
+  <div class="progressive-wallet"><span>${lab?starIcon:tokenIcon} Available ${lab?'keys':'tokens'}</span><strong>${n(count)}</strong></div>
  </div>
  <div class="ember-stage" data-ember-stage="${game}" aria-label="3D ${game} environment"></div>
  <div class="progressive-modes">${['normal','elite'].map(mode=>{
  const elite=mode==='elite',pool=p.pools[game+':'+mode],locked=elite&&!p.eliteUnlocked;
  return `<div class="progressive-mode ${elite?'progressive-mode--elite':''}">
  <div class="progressive-mode-heading"><strong>${elite?'💎 Elite':'⚔️ Normal'}</strong><span>${elite?'10× rewards':'Standard rewards'}</span></div>
- <div class="progressive-prize"><small>Current gem jackpot</small><strong>💎 ${n(pool.value)}</strong></div>
+ <div class="progressive-prize"><small>Current gem jackpot</small><strong>${starIcon} ${n(pool.value)}</strong></div>
  <div class="progressive-stats"><span>Plays: ${n(pool.spins)}</span><span>Jackpots won: ${n(pool.wins)}</span></div>
  <button data-progressive-mode="${mode}" ${locked||count<1?'disabled':''}>${locked?'🔒 Elite locked':count<1?'Need 1 '+(lab?'key':'token'):'▶ Play '+(elite?'Elite':'Normal')}</button>
  </div>`}).join('')}</div>
