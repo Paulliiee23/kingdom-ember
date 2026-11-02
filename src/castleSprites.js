@@ -31,9 +31,10 @@ export function castleSpriteTier(level){
  return CASTLE_MILESTONES.find(t=>lv>=t.min)?.key||'frontier';
 }
 export async function preloadCastleSprites(){
- // Milestones first; per-level artwork can stream in as the player upgrades.
+ // Preload six milestone images only; avoid 35 unnecessary requests on Android.
+ // Exact-level images are fetched on demand as a castle is rendered.
  const milestoneKeys=CASTLE_MILESTONES.map(t=>t.key);
- const keys=[...new Set([...milestoneKeys,...Array.from({length:CASTLE_MAX_LEVEL},(_,i)=>'level-'+(i+1))])];
+ const keys=[...new Set(milestoneKeys)];
  return (await Promise.all(keys.map(load))).filter(Boolean);
 }
 export function createCastleSprite(level){
