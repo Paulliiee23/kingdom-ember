@@ -271,17 +271,19 @@ function emberDetails(g,b){const level=b.level;const castle=b.type==='castle';
 // Castle visual stages are independent of gameplay upgrades and never modify saves.
 function emberCastleStage(level,unified=0){
  if(unified>=1)return {name:'Unified Citadel',primary:0x276caa,roof:0x58c5f5,accent:0x8be8ff,scale:1.32};
- if(level>=25)return {name:'Amethyst Citadel',primary:0x65418d,roof:0x8f54c5,accent:0xe4b8ff,scale:1.28};
- if(level>=17)return {name:'Red Stronghold',primary:0x8c3030,roof:0xc52b2e,accent:0xf2b45f,scale:1.22};
- if(level>=9)return {name:'Timber Bastion',primary:0x78502f,roof:0x694024,accent:0xd0a06b,scale:1.13};
+ if(level>=35)return {name:'Amethyst Citadel',primary:0x65418d,roof:0x8f54c5,accent:0xe4b8ff,scale:1.28};
+ if(level>=29)return {name:'Amethyst Ascent',primary:0x65418d,roof:0x8f54c5,accent:0xe4b8ff,scale:1.28};
+ if(level>=22)return {name:'Royal Citadel',primary:0x8e7c92,roof:0x64408c,accent:0xe6c479,scale:1.24};
+ if(level>=15)return {name:'Red Stronghold',primary:0x8c3030,roof:0xc52b2e,accent:0xf2b45f,scale:1.22};
+ if(level>=8)return {name:'Timber Bastion',primary:0x78502f,roof:0x694024,accent:0xd0a06b,scale:1.13};
  return {name:'Frontier Fort',primary:0x81552f,roof:0x986334,accent:0xcab39b,scale:1};
 }
 function emberFortress(parent,level,unified=0,size=1){
  // All levels have distinct procedural geometry; no asset download or save migration.
  const lv=Math.max(1,Math.floor(Number(level)||1));
  const stage=emberCastleStage(lv,unified);
- const tier=unified>=1?4:lv>=25?3:lv>=17?2:lv>=9?1:0;
- const step=unified>=1?Math.max(0,Math.floor(unified)-1):tier===3?Math.min(5,lv-25):tier===2?lv-17:tier===1?lv-9:lv-1;
+ const tier=unified>=1?4:lv>=22?3:lv>=15?2:lv>=8?1:0;
+ const step=unified>=1?Math.max(0,Math.floor(unified)-1):tier===3?Math.max(0,lv-22):tier===2?lv-15:tier===1?lv-8:lv-1;
  const progress=Math.min(step,7),large=tier>=1,royal=tier>=2,advanced=tier>=3,ascended=tier===4;
  const f=new THREE.Group();parent.add(f);f.scale.setScalar(size);
  const wall=new THREE.MeshStandardMaterial({color:stage.primary,roughness:.86});
@@ -459,6 +461,21 @@ function emberFortress(parent,level,unified=0,size=1){
    }
   }
  }
+ // Levels 31–35: distinct upper-citadel silhouettes and ceremonial details.
+ if(!ascended&&lv>=31){
+  const crownGold=new THREE.MeshStandardMaterial({color:0xf1cb79,metalness:.62,roughness:.29});
+  const amethyst=new THREE.MeshStandardMaterial({color:0xba75ff,emissive:0x642ba0,emissiveIntensity:.7,roughness:.22});
+  const ivory=new THREE.MeshStandardMaterial({color:0xf0e4d7,roughness:.82});
+  if(lv>=31){for(const x of [-.87,.87]){cube(f,.28,.52,.28,ivory,x,2.12,.22);cone(f,.23,.48,amethyst,x,2.61,.22,6)}}
+  if(lv>=32){for(const z of [-.6,.6]){cube(f,.23,.6,.23,ivory,0,2.15,z);cone(f,.19,.52,amethyst,0,2.67,z,6)}}
+  if(lv>=33){for(const x of [-.72,.72]){cube(f,.13,.67,.12,crownGold,x,2.5,.75);cone(f,.15,.35,amethyst,x,3.02,.75,6)}}
+  if(lv>=34){cube(f,.86,.17,.85,crownGold,0,keepH+2.5,-.23);cone(f,.3,.67,amethyst,0,keepH+3.1,-.23,6)}
+  if(lv>=35){
+   for(const x of [-1,1])for(const z of [-1,1]){cube(f,.16,.36,.16,crownGold,x,towerH+1.65,z);cone(f,.22,.58,amethyst,x,towerH+2.12,z,6)}
+   cube(f,.52,.25,.5,crownGold,0,keepH+3.42,-.23);
+   cone(f,.36,.92,amethyst,0,keepH+4.0,-.23,8);
+  }
+ }
  if(ascended){
   const crystal=new THREE.MeshStandardMaterial({color:0x6edfff,emissive:0x1b84bd,emissiveIntensity:.8,roughness:.17});
   cone(f,.27,.79,crystal,0,keepH+1.15,-.23,6);
@@ -466,7 +483,7 @@ function emberFortress(parent,level,unified=0,size=1){
  }
  // Royal citadel architectural pass: blue rooflines, gilded caps and glowing windows.
  // Geometry is decorative only and stays inside the existing building footprint.
- const azureRoof=new THREE.MeshStandardMaterial({color:ascended?0x226b91:advanced?0x244c85:0x345f88,roughness:.48,metalness:.16});
+ const azureRoof=new THREE.MeshStandardMaterial({color:ascended?0x226b91:advanced?0x5d348d:royal?0x873947:0x654d3d,roughness:.48,metalness:.16});
  const royalTrim=new THREE.MeshStandardMaterial({color:0xe6c47c,roughness:.34,metalness:.58});
  const paleStone=new THREE.MeshStandardMaterial({color:0xd8d8d0,roughness:.82});
  const windowGlow=new THREE.MeshStandardMaterial({color:0x99d9f4,emissive:0x2474aa,emissiveIntensity:.48,roughness:.22});
@@ -497,7 +514,7 @@ function emberFortress(parent,level,unified=0,size=1){
  cone(f,.16,.38,royalTrim,0,keepH+1.59,-.23,6);
  // Royal banners are more prominent as the castle grows.
  if(royal){
-  const bannerMat=new THREE.MeshStandardMaterial({color:advanced?0x55378e:0x315a99,roughness:.8,side:THREE.DoubleSide});
+  const bannerMat=new THREE.MeshStandardMaterial({color:advanced?0x55378e:0x8e303b,roughness:.8,side:THREE.DoubleSide});
   for(const x of [-.88,.88]){
    cube(f,.24,.58,.045,bannerMat,x,1.11,1.2);
    cube(f,.07,.62,.065,royalTrim,x,1.12,1.24);
@@ -645,7 +662,7 @@ if(b.type==='castle'){
  // New modelled castle asset replaces the old primitive fortress visual.
  const castleAsset=createCastleSprite(level)||createCastleGLBInstance(level);
  if(castleAsset)g.add(castleAsset);
- else emberFortress(g,level,1,1);
+ else emberFortress(g,level,unified,1);
 }else if(b.type==='farm'){
  cube(g,1.4,.95,1.35,detail.plaster,-.2,.72,-.12);roof(g,1.65,1.65,1.57,materials.roof);cube(g,.4,.72,.12,detail.darkwood,-.2,.53,.59);windowAt(g,.3,.94,.59);
  for(let i=0;i<4;i++)for(let j=0;j<3;j++){cube(g,.07,.25,.07,detail.wheat,-1.02+i*.3,.34,.84+j*.17)}
