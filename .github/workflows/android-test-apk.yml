@@ -11,10 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout game
         uses: actions/checkout@v4
+
+      - name: Generate and commit static castle GLB
+        run: |
+          python -m pip install --disable-pip-version-check numpy trimesh
+          python scripts/build_royal_castle.py
+          if ! git ls-files --error-unmatch public/models/Royal_Castle_v095.glb >/dev/null 2>&1 || ! git diff --quiet -- public/models/Royal_Castle_v095.glb; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/models/Royal_Castle_v095.glb
+            git commit -m "Add packaged Royal Castle GLB model"
+            git push
+          fi
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
