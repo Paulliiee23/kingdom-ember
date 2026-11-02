@@ -19,12 +19,10 @@ export function preloadRoyalCastle(){
 // Distinct visual upgrade tiers, applied to cloned meshes (never the shared source).
 function castleTier(level){
  const lv=Math.max(1,Math.floor(Number(level)||1));
- if(lv>=25)return {name:'Imperial',roof:0x612a86,stone:0xf0e5d4,metal:0xf1c35e,scale:1.15,spires:4};
- if(lv>=20)return {name:'Royal',roof:0x742c72,stone:0xe3d7c8,metal:0xe6b85b,scale:1.12,spires:4};
- if(lv>=15)return {name:'Citadel',roof:0x8c4532,stone:0xd3c4b2,metal:0xd7a45d,scale:1.08,spires:4};
- if(lv>=10)return {name:'Fortress',roof:0x315b79,stone:0xc5c2b8,metal:0xc6a15a,scale:1.05,spires:2};
- if(lv>=5)return {name:'Stronghold',roof:0x345c75,stone:0xbdb8ac,metal:0xa58c62,scale:1.02,spires:2};
- return {name:'Keep',roof:0x28578b,stone:0xd6d0c1,metal:0xb89c65,scale:1,spires:0};
+ if(lv>=25)return {name:'Amethyst Citadel',roof:0x612a86,stone:0xf0e5d4,metal:0xf1c35e,scale:1.15,spires:4};
+ if(lv>=17)return {name:'Red Stronghold',roof:0x742c72,stone:0xe3d7c8,metal:0xe6b85b,scale:1.12,spires:4};
+ if(lv>=9)return {name:'Timber Bastion',roof:0x8c4532,stone:0xd3c4b2,metal:0xd7a45d,scale:1.08,spires:4};
+ return {name:'Frontier Fort',roof:0x93602d,stone:0xbcb0a0,metal:0xb89c65,scale:1,spires:0};
 }
 export function createCastleGLBInstance(level=1){
  if(!source)return null;
@@ -33,6 +31,9 @@ export function createCastleGLBInstance(level=1){
  // Clone materials before modifying them: upgrades must not recolour other castles.
  castle.traverse(obj=>{
   if(!obj.isMesh)return;
+  const part=obj.name.toLowerCase();
+  if((part.includes('tier25_')&&level<25)||(part.includes('tier17_')&&level<17)||(part.includes('tier9_')&&level<9)){obj.visible=false;return}
+
   const recolour=(material)=>{
    const m=material.clone();
    if(!m.color)return m;
