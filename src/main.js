@@ -660,7 +660,9 @@ function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*
 if(b.type==='castle'){
  const unified=Number(state.castleUnifiedLevel||state.unifiedLevel||state.castleManaLevel||state.manaLevel||0);
  // New modelled castle asset replaces the old primitive fortress visual.
- const castleAsset=createCastleSprite(level)||createCastleGLBInstance(level);
+ // The top five levels use the newly sculpted procedural crown until matching art is shipped.
+ // Existing sprite art still takes priority when available.
+ const castleAsset=createCastleSprite(level)||(Number(level)>=31?null:createCastleGLBInstance(level));
  if(castleAsset)g.add(castleAsset);
  else emberFortress(g,level,unified,1);
 }else if(b.type==='farm'){
