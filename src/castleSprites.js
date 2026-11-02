@@ -27,7 +27,7 @@ export function createCastleSprite(level){
  const material=new THREE.MeshBasicMaterial({map:texture,transparent:true,alphaTest:.08,side:THREE.DoubleSide,depthWrite:false});
  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(3.7,4.1),material);
  // Sprite faces the fixed city camera, but stays anchored to its plot.
- mesh.rotation.y=-Math.PI/4;
+ mesh.rotation.y=Math.PI/4;
  mesh.position.set(0,2.05,0);
  mesh.renderOrder=5;
  mesh.userData.isCastleSprite=true;
