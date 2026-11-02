@@ -34,10 +34,30 @@ export function playProgressive(state,game,mode='normal',random=Math.random){
  return {ok:true,jackpot:reward,bossChests,pool:pool.value,mode,game};
 }
 export function progressivePanel(state,game){
- const p=jackpotState(state),item=game==='labyrinth'?'labyrinthKeys':'tycoonTokens';
- return '<div class="ember-stage" data-ember-stage="'+game+'" aria-label="3D '+game+' environment"></div><h3>'+ (game==='labyrinth'?'Ember Labyrinth':'Royal Tycoon') +' — Progressive Jackpot</h3><p>Available '+item+': '+(state.specialItems?.[item]||0)+'</p><p>Playtest simulation: no real-money purchases. Jackpot odds 1% per play; Tycoon Boss chance 20% (chests ×1 70%, ×2 25%, ×3 5% on boss).</p>'+
- ['normal','elite'].map(mode=>{const pool=p.pools[game+':'+mode];return '<div class="item"><strong>'+ (mode==='elite'?'Elite (10×)':'Normal')+'</strong> · Jackpot: '+pool.value.toLocaleString()+' gems · Plays: '+pool.spins+' · Wins: '+pool.wins+'<p><button data-progressive-mode="'+mode+'" '+(mode==='elite'&&!p.eliteUnlocked?'disabled':'')+'>Play '+mode+' (1 '+item+')</button></p></div>'}).join('')+
- (!p.eliteUnlocked?'<button id="testEliteUnlock">Simulate maximum-price pack purchase — unlock Elite (free test)</button>':'<p>Elite unlocked for testing ✓</p>')+
- (game==='tycoon'?'<p>Boss gem chests earned: '+p.bossChests+' (reward inventory counter)</p>':'')+
- '<p>Jackpots grow by 25 gems per Normal play and 250 per Elite play. Each jackpot resets independently after a win.</p>';
+ const p=jackpotState(state),lab=game==='labyrinth',item=lab?'labyrinthKeys':'tycoonTokens';
+ const title=lab?'Ember Labyrinth':'Royal Tycoon';
+ const count=state.specialItems?.[item]||0;
+ const history=p.history.filter(h=>h.game===game).slice(0,5);
+ const n=x=>Number(x||0).toLocaleString();
+ return `<section class="progressive-game progressive-game--${game}" aria-label="${title}">
+ <div class="progressive-hero">
+  <div class="progressive-eyebrow">${lab?'EXPLORE · SURVIVE · DISCOVER':'BUILD · COLLECT · WIN'}</div>
+  <h3>${lab?'🌀':'🎲'} ${title}</h3>
+  <p>${lab?'Enter the ancient chambers and uncover the Ember treasury.':'Run your royal enterprise and uncover treasure from the Tycoon Boss.'}</p>
+  <div class="progressive-wallet"><span>🎟️ Available ${lab?'keys':'tokens'}</span><strong>${n(count)}</strong></div>
+ </div>
+ <div class="ember-stage" data-ember-stage="${game}" aria-label="3D ${game} environment"></div>
+ <div class="progressive-modes">${['normal','elite'].map(mode=>{
+ const elite=mode==='elite',pool=p.pools[game+':'+mode],locked=elite&&!p.eliteUnlocked;
+ return `<div class="progressive-mode ${elite?'progressive-mode--elite':''}">
+ <div class="progressive-mode-heading"><strong>${elite?'💎 Elite':'⚔️ Normal'}</strong><span>${elite?'10× rewards':'Standard rewards'}</span></div>
+ <div class="progressive-prize"><small>Current gem jackpot</small><strong>💎 ${n(pool.value)}</strong></div>
+ <div class="progressive-stats"><span>Plays: ${n(pool.spins)}</span><span>Jackpots won: ${n(pool.wins)}</span></div>
+ <button data-progressive-mode="${mode}" ${locked||count<1?'disabled':''}>${locked?'🔒 Elite locked':count<1?'Need 1 '+(lab?'key':'token'):'▶ Play '+(elite?'Elite':'Normal')}</button>
+ </div>`}).join('')}</div>
+ ${!p.eliteUnlocked?'<button id="testEliteUnlock">🔓 Unlock Elite for free playtesting</button>':'<p>💎 Elite mode unlocked</p>'}
+ ${!lab?'<div class="progressive-boss"><strong>👑 Tycoon Boss vault</strong><p>Boss gem chests collected: '+n(p.bossChests)+'</p><small>Each play has a 20% chance to award 1–3 boss chests.</small></div>':'<div class="progressive-boss"><strong>🗝️ Labyrinth expedition</strong><p>Spend a key to claim gold and seek the progressive gem jackpot.</p></div>'}
+ <details class="progressive-history"><summary>Recent expeditions and rewards</summary>${history.length?history.map(h=>'<p>'+(h.mode==='elite'?'💎 Elite':'⚔️ Normal')+' · '+(h.jackpot?'Jackpot '+n(h.jackpot)+' gems':lab?'250 gold base reward':'200 stone base reward')+(h.bossChests?' · '+h.bossChests+' boss chests':'')+'</p>').join(''):'<p>No plays yet. Your history will appear here.</p>'}</details>
+ <p class="muted">Offline simulation only. No real-money purchases. Jackpot chance: 1% per play; pools increase by 25 gems (Normal) or 250 gems (Elite).</p>
+ </section>`;
 }
