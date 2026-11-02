@@ -15,6 +15,7 @@ export function mountFantasyStages(root=document){
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   host.appendChild(renderer.domElement);
+  host.title='Drag to rotate the scene. Pinch with two fingers to zoom.';
   const ambient=new THREE.HemisphereLight(0xc4d7ff,0x49344c,2.1);scene.add(ambient);
   const key=new THREE.DirectionalLight(type==='tycoon'?0x87cfff:0xffb8a1,3.3);
   key.position.set(-5,12,8);scene.add(key);
@@ -92,12 +93,54 @@ export function mountFantasyStages(root=document){
    }
    for(const x of [-5.5,5.5])for(const z of [-3.8,3.8]){ring(x,.15,z,.75,gold);sparkle(x,1.3,z)}
   }
+  // Controlled orbit: drag to rotate, pinch to zoom. The scene cannot fly away.
+  let orbitYaw=.5,orbitPitch=.48,orbitRadius=type==='tycoon'?29:23;
+  const orbitTarget=new THREE.Vector3(0,1,0);
+  const pointers=new Map();
+  let previousPinch=null;
+  const setCamera=()=>{
+    const horizontal=Math.cos(orbitPitch)*orbitRadius;
+    camera.position.set(orbitTarget.x+Math.sin(orbitYaw)*horizontal,
+      orbitTarget.y+Math.sin(orbitPitch)*orbitRadius,
+      orbitTarget.z+Math.cos(orbitYaw)*horizontal);
+    camera.lookAt(orbitTarget);
+  };
+  setCamera();
+  const pointerDown=e=>{host.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});previousPinch=null};
+  const pointerMove=e=>{
+    if(!pointers.has(e.pointerId))return;
+    const prev=pointers.get(e.pointerId);
+    const dx=THREE.MathUtils.clamp(e.clientX-prev.x,-30,30);
+    const dy=THREE.MathUtils.clamp(e.clientY-prev.y,-30,30);
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===1){
+      orbitYaw-=dx*.0035;
+      orbitPitch=THREE.MathUtils.clamp(orbitPitch+dy*.0025,.25,.95);
+    }else if(pointers.size===2){
+      const a=[...pointers.values()];
+      const distance=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+      if(previousPinch!==null)orbitRadius=THREE.MathUtils.clamp(orbitRadius+(previousPinch-distance)*.035,15,39);
+      previousPinch=distance;
+    }
+    setCamera();
+  };
+  const pointerUp=e=>{pointers.delete(e.pointerId);previousPinch=null};
+  host.addEventListener('pointerdown',pointerDown);
+  host.addEventListener('pointermove',pointerMove);
+  host.addEventListener('pointerup',pointerUp);
+  host.addEventListener('pointercancel',pointerUp);
+  host.addEventListener('lostpointercapture',pointerUp);
   let active=true,last=0;
   const observer=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(w&&h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}});observer.observe(host);
   function frame(t){
    if(!active)return;
    if(!host.isConnected){
     active=false;observer.disconnect();
+    host.removeEventListener('pointerdown',pointerDown);
+    host.removeEventListener('pointermove',pointerMove);
+    host.removeEventListener('pointerup',pointerUp);
+    host.removeEventListener('pointercancel',pointerUp);
+    host.removeEventListener('lostpointercapture',pointerUp);
     scene.traverse(o=>{if(o.isMesh){o.geometry?.dispose();for(const m of (Array.isArray(o.material)?o.material:[o.material]))m?.dispose()}});
     renderer.dispose();instances.delete(host);return
    }
