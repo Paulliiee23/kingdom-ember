@@ -50,7 +50,7 @@ export function createCastleSprite(level){
  const milestone=CASTLE_MILESTONES.find(t=>t.min===lv);
  const texture=cache.get(key)||(milestone?cache.get(fallback):null);
  if(!texture){
-  // Missing level art falls back to the existing castle model.
+  // Missing level art falls back to the built-in dedicated royal castle illustration.
   load(key);
   if(milestone)load(fallback);
   return null;
@@ -60,10 +60,10 @@ export function createCastleSprite(level){
  // Preserve source-image proportions so artwork never stretches across upgrades.
  const image=texture.image;
  const aspect=image?.width&&image?.height?image.width/image.height:3.7/4.1;
- const height=4.1;
+ const height=4.96;
  const mesh=new THREE.Sprite(material);
  mesh.scale.set(height*aspect,height,1);
- mesh.position.set(0,2.05,0);
+ mesh.position.set(0,height/2,0);
  mesh.renderOrder=5;
  mesh.userData.isCastleSprite=true;
  mesh.userData.castleLevel=lv;
