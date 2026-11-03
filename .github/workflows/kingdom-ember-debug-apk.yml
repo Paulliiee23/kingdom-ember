@@ -39,6 +39,50 @@ jobs:
           fi
       - name: Synchronize Capacitor
         run: npx cap sync android
+      # A stable signing key is required for Android to install new builds over
+      # an existing installation. The four repository secrets are configured once.
+      - name: Restore persistent Android signing key
+        env:
+          EMBER_KEYSTORE_BASE64: ${{ secrets.EMBER_KEYSTORE_BASE64 }}
+          EMBER_KEYSTORE_PASSWORD: ${{ secrets.EMBER_KEYSTORE_PASSWORD }}
+          EMBER_KEY_ALIAS: ${{ secrets.EMBER_KEY_ALIAS }}
+          EMBER_KEY_PASSWORD: ${{ secrets.EMBER_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          if [[ -z "$EMBER_KEYSTORE_BASE64" || -z "$EMBER_KEYSTORE_PASSWORD" || -z "$EMBER_KEY_ALIAS" || -z "$EMBER_KEY_PASSWORD" ]]; then
+            echo "::warning::Persistent signing secrets are missing. This APK will use a temporary debug key and cannot reliably update previous builds."
+            exit 0
+          fi
+          printf '%s' "$EMBER_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/kingdom-ember-signing.jks"
+          {
+            echo "EMBER_SIGNING_STORE_FILE=$RUNNER_TEMP/kingdom-ember-signing.jks"
+            echo "EMBER_SIGNING_STORE_PASSWORD=$EMBER_KEYSTORE_PASSWORD"
+            echo "EMBER_SIGNING_KEY_ALIAS=$EMBER_KEY_ALIAS"
+            echo "EMBER_SIGNING_KEY_PASSWORD=$EMBER_KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+          echo "Persistent signing key restored."
+      - name: Configure Android debug signing
+        shell: bash
+        run: |
+          if [[ -z "${EMBER_SIGNING_STORE_FILE:-}" ]]; then exit 0; fi
+          cat >> android/app/build.gradle <<'GRADLE'
+          // Keep debug builds update-compatible across ephemeral CI runners.
+          android {
+            signingConfigs {
+              emberPersistent {
+                storeFile file(System.getenv('EMBER_SIGNING_STORE_FILE'))
+                storePassword System.getenv('EMBER_SIGNING_STORE_PASSWORD')
+                keyAlias System.getenv('EMBER_SIGNING_KEY_ALIAS')
+                keyPassword System.getenv('EMBER_SIGNING_KEY_PASSWORD')
+              }
+            }
+            buildTypes {
+              debug {
+                signingConfig signingConfigs.emberPersistent
+              }
+            }
+          }
+          GRADLE
       - name: Assemble debug APK
         working-directory: android
         run: bash ./gradlew assembleDebug --no-daemon
