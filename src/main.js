@@ -1,3 +1,4 @@
+import { installTycoonRoute, stopTycoon } from './tycoonRoute.js';
 import { createRoyalCastleArtwork } from './royalCastleArtwork.js';
 import { createIsometricArtwork } from './isometricArtwork.js';
 import { loadBuildingSprite, createBuildingSprite } from './buildingSprites.js';
@@ -958,6 +959,12 @@ function bindBuildingActions(p){const action=(id,fn)=>p.querySelector('#'+id)?.a
  const prize=p.querySelector('[data-jackpot-value]');if(prize&&progress)prize.textContent=Number(progress.value||0).toLocaleString();
  const info=p.querySelector('[data-ember-mode-info]');if(info)info.textContent=(mode==='elite'?'Elite · 10× rewards':'Normal')+' · 1 '+(game==='labyrinth'?'star':'token')+' per use';
  }));
+ if(selected?.type==='tycoon'){
+  installTycoonRoute(p,{
+   play:()=>{const mode=p.querySelector('.ember-play-screen')?.dataset.activeMode||'normal';const result=playProgressive(state,'tycoon',mode);if(result.ok){save();refreshTop();}return result},
+   onFinish:result=>{if(result.jackpot)msg('Tycoon jackpot! +'+result.jackpot+' gems');else if(result.bossChests)msg('Tycoon: '+result.bossChests+' bonus chest(s)');}
+  });
+ }
  p.querySelector('[data-ember-auto]')?.addEventListener('click',()=>{
  const mode=p.querySelector('.ember-play-screen')?.dataset.activeMode||'normal',game=selected.type==='labyrinth'?'labyrinth':'tycoon';
  let plays=0,won=0;for(let i=0;i<3;i++){const result=playProgressive(state,game,mode);if(!result.ok)break;plays++;won+=result.jackpot||0}
