@@ -3,9 +3,9 @@ export const BASE_JACKPOT=1000;
 export const ELITE_BASE_JACKPOT=1000000;
 const ELITE_JUMP_NORMAL_THRESHOLD=1000000;
 const ELITE_JUMP_VALUE=10000000;
-const AUTO_GROWTH_INTERVAL_MS=60000;
-const AUTO_GROWTH_NORMAL=25;
-const AUTO_GROWTH_ELITE=250;
+const AUTO_GROWTH_INTERVAL_MS=1000;
+const AUTO_GROWTH_NORMAL=1;
+const AUTO_GROWTH_ELITE=10;
 const MAX_OFFLINE_GROWTH_MS=24*60*60*1000;
 function synchronizeElite(p,game){
  const normal=p.pools[game+':normal'],elite=p.pools[game+':elite'];
@@ -63,11 +63,12 @@ export function playProgressive(state,game,mode='normal',random=Math.random){
 }
 export function progressivePanel(state,game){
  const p=jackpotState(state),lab=game==='labyrinth',item=lab?'labyrinthKeys':'tycoonTokens';
+ const activeMode=state.progressiveMode?.[game]==='elite'&&p.eliteUnlocked?'elite':'normal';
  const title=lab?'Ember Labyrinth':'Royal Tycoon',count=state.specialItems?.[item]||0;
  const n=x=>Number(x||0).toLocaleString();
  const icon=lab?'/art/ui/kingdom_ember_star.svg':'/art/ui/kingdom_ember_token.svg';
  const history=p.history.filter(h=>h.game===game).slice(0,4);
- return `<section class="ember-play-screen ${lab?'ember-play-lab':'ember-play-tycoon'}" data-ember-game="${game}" data-active-mode="normal" aria-label="${title}">
+ return `<section class="ember-play-screen ${lab?'ember-play-lab':'ember-play-tycoon'}" data-ember-game="${game}" data-active-mode="${activeMode}" aria-label="${title}">
   <header class="ember-play-top"><div><span class="ember-play-subtitle">${lab?'ANCIENT RUINS':'ROYAL TREASURE PATH'}</span><h3>${title}</h3></div><div class="ember-play-balance"><img src="${icon}" alt=""><strong>${n(count)}</strong></div></header>
   <div class="ember-play-world">
    <div class="ember-play-landscape">
@@ -84,11 +85,11 @@ export function progressivePanel(state,game){
      <div class="tycoon-run-status" data-tycoon-status>Ready to explore</div>
     </div>`}
    </div>
-   <div class="ember-play-jackpot"><span>💎 PROGRESSIVE JACKPOT</span><strong data-jackpot-value>${n(p.pools[game+':normal'].value)}</strong></div>
+   <div class="ember-play-jackpot"><span>💎 PROGRESSIVE JACKPOT</span><strong data-jackpot-value>${n(p.pools[game+':'+activeMode].value)}</strong></div>
   </div>
   <div class="ember-play-controls">
-   <div class="ember-play-mode-picker" role="group" aria-label="Play mode"><button type="button" data-ember-select-mode="normal" class="is-active" aria-pressed="true">Normal</button><button type="button" data-ember-select-mode="elite" aria-pressed="false" ${!p.eliteUnlocked?'disabled':''}>Elite ${p.eliteUnlocked?'':'🔒'}</button></div>
-   <div class="ember-play-use"><div class="ember-play-mode-info" data-ember-mode-info>Normal · 1 ${lab?'star':'token'} per use</div><button type="button" class="ember-play-use-button" data-progressive-mode="normal" ${count<1?'disabled':''}>${lab?'USE':'START'} <span><img src="${icon}" alt=""> 1</span></button><button type="button" class="ember-play-auto" data-ember-auto>${lab?'Auto Use ×3':'AUTO START'}</button>${lab?'':'<button type="button" class="tycoon-stop" data-tycoon-stop disabled>STOP</button><button type="button" class="tycoon-speed" data-tycoon-speed>×1 SPEED</button>'}</div>
+   <div class="ember-play-mode-picker" role="group" aria-label="Play mode"><button type="button" data-ember-select-mode="normal" class="${activeMode==='normal'?'is-active':''}" aria-pressed="${activeMode==='normal'}">Normal</button><button type="button" data-ember-select-mode="elite" class="${activeMode==='elite'?'is-active':''}" aria-pressed="${activeMode==='elite'}" ${!p.eliteUnlocked?'disabled':''}>Elite ${p.eliteUnlocked?'':'🔒'}</button></div>
+   <div class="ember-play-use"><div class="ember-play-mode-info" data-ember-mode-info>${activeMode==='elite'?'Elite · 10× rewards':'Normal'} · 1 ${lab?'star':'token'} per use</div><button type="button" class="ember-play-use-button" data-progressive-mode="${activeMode}" ${count<1?'disabled':''}>${lab?'USE':'START'} <span><img src="${icon}" alt=""> 1</span></button><button type="button" class="ember-play-auto" data-ember-auto>${lab?'Auto Use ×3':'AUTO START'}</button>${lab?'':'<button type="button" class="tycoon-stop" data-tycoon-stop disabled>STOP</button><button type="button" class="tycoon-speed" data-tycoon-speed>×1 SPEED</button>'}</div>
   </div>
   <div class="ember-play-footer"><span>${lab?'Explore the ruins and defeat the boss':'Advance along the treasure path'}</span><span>Offline playtest · no purchases</span></div>
   ${!p.eliteUnlocked?'<button type="button" id="testEliteUnlock" class="ember-play-unlock">Unlock Elite (free testing)</button>':''}
