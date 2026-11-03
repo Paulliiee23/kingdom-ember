@@ -1,6 +1,6 @@
 import { createIsometricArtwork } from './isometricArtwork.js';
 import { loadBuildingSprite, createBuildingSprite } from './buildingSprites.js';
-import { preloadCastleSprites, createCastleSprite } from './castleSprites.js';
+import { preloadCastleSprites, createCastleSprite, onCastleArtworkReady } from './castleSprites.js';
 import { installAndroidUpdater } from './androidUpdater.js';
 import { observeFantasyStages } from './fantasyStages.js';
 import { preloadRoyalCastle, createCastleGLBInstance } from './castleGLBLoader.js';
@@ -690,6 +690,18 @@ if(b.type!=='castle')cube(g,1.95,.045,.08,detail.trim,0,.25,1.16);if(b.type!=='c
   g.add(art);
  }else{architectureDetail(g,b);emberDetails(g,b);royalBuildingDetail(g,b);refineBuildingArtwork(g,b)}
 }g.userData.building=b;scene.add(g);objects.push(g)}
+// Replace procedural castle art with the downloaded level-specific illustration
+// as soon as it is available, without requiring a restart or another upgrade.
+onCastleArtworkReady(()=>{
+ if(view!=='city')return;
+ const castle=state.buildings.find(b=>b.type==='castle');
+ if(!castle)return;
+ const current=objects.find(o=>o.userData.building===castle);
+ if(!current)return;
+ scene.remove(current);
+ objects.splice(objects.indexOf(current),1);
+ makeBuilding(castle);
+});
 function clearObjects(){objects.forEach(o=>scene.remove(o));objects=[];walkers.length=0;waterFeatures=[];if(placementPreview){scene.remove(placementPreview);placementPreview=null}}const KINGDOM_SIZE=1536;const worldToCoordinates=(x,z)=>({x:Math.max(0,Math.min(KINGDOM_SIZE,Math.round(x+KINGDOM_SIZE/2))),y:Math.max(0,Math.min(KINGDOM_SIZE,Math.round(z+KINGDOM_SIZE/2)))});const coordinatesToWorld=(x,y)=>({x:x-KINGDOM_SIZE/2,z:y-KINGDOM_SIZE/2});const realm=realmState(state);let HOME_POSITION={x:realm.x-768,z:realm.y-768};const KINGDOM_OBJECTIVES=[{id:'base',name:'Kingdom Base',x:0,z:0,size:80},{id:'fort-1',name:'Kingdom Fort 1',x:-370,z:-570,size:20},{id:'fort-2',name:'Kingdom Fort 2',x:370,z:-570,size:20},{id:'fort-3',name:'Kingdom Fort 3',x:-370,z:570,size:20},{id:'fort-4',name:'Kingdom Fort 4',x:370,z:570,size:20},{id:'fort-5',name:'Kingdom Fort 5',x:-610,z:0,size:20},{id:'fort-6',name:'Kingdom Fort 6',x:610,z:0,size:20}];function inNoShieldZone(x,z){return KINGDOM_OBJECTIVES.find(o=>Math.abs(x-o.x)<o.size/2&&Math.abs(z-o.z)<o.size/2)||null}let selectedWorldTarget=null;function addCastleShield(x,z,radius){
 const cosmetic=shieldCosmetics(state);
 const design=SHIELD_DESIGNS.find(d=>d.id===cosmetic.selectedDesign)||SHIELD_DESIGNS[0];
