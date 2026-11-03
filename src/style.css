@@ -348,3 +348,31 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
  #top{min-height:38px}
  #panel{top:48px;max-height:calc(100dvh - 100px)}
 }
+
+/* Tycoon treasure-road scene, modelled on the supplied gameplay reference. */
+.ember-play-tycoon .ember-play-world{min-height:270px;background:linear-gradient(145deg,#75b6e7 0%,#5278bd 42%,#172e68 100%)}
+.ember-play-tycoon .ember-play-landscape{background:radial-gradient(ellipse at 62% 23%,#b1edffb0,transparent 47%),linear-gradient(150deg,#87c5e9,#4d72b4 60%,#223a7e)}
+.ember-play-tycoon .ember-play-cliff{opacity:.4}
+.ember-play-tycoon .ember-play-avatar,.ember-play-tycoon .ember-play-path,.ember-play-tycoon .ember-play-destination,.ember-play-tycoon .ember-play-treasure{display:none}
+.tycoon-route{position:absolute;inset:5% 0 0;overflow:hidden}
+.tycoon-route:before{content:'';position:absolute;inset:13% -4% -35%;background:linear-gradient(155deg,#a7d9f4,#6ba6d7 46%,#4167b5);clip-path:polygon(0 29%,30% 0,57% 23%,77% 2%,100% 26%,100% 75%,70% 94%,34% 75%,0 100%);filter:drop-shadow(0 20px 10px #11295c)}
+.tycoon-route-lines{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 5px #e9fbff)}
+.tycoon-tile{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%) rotate(-7deg);display:grid;place-items:center;width:43px;height:40px;border:3px solid #d5d8b6;border-radius:8px;background:linear-gradient(145deg,#344d5c,#18263d);font-size:23px;box-shadow:0 7px 0 #1b3256,0 9px 15px #071d3b9c}
+.tycoon-tile-active{border-color:#fff6a7;box-shadow:0 0 19px #ffe78d,0 7px 0 #1b3256}
+.tycoon-runner{position:absolute;left:9%;top:70%;transform:translate(-50%,-85%);font-size:38px;z-index:3;filter:drop-shadow(0 6px 4px #17234c)}
+.tycoon-run-status{position:absolute;top:9px;left:50%;transform:translateX(-50%);background:#1c3e6bcb;border:1px solid #c9e9ff;border-radius:9px;padding:5px 11px;font-size:12px;white-space:nowrap}
+.ember-play-tycoon .ember-play-jackpot{z-index:4;background:linear-gradient(135deg,#a95cdb,#45266e);border-color:#f1c86e}
+.ember-play-tycoon .ember-play-use{flex-direction:row;flex-wrap:wrap;align-items:stretch}
+.ember-play-tycoon .ember-play-use-button{flex:2;min-height:42px!important}
+.ember-play-tycoon .ember-play-auto,.ember-play-tycoon .tycoon-stop,.ember-play-tycoon .tycoon-speed{flex:1;min-height:42px;padding:8px}
+.ember-play-tycoon .tycoon-stop{background:linear-gradient(#a64b40,#5d2429)}
+.ember-play-tycoon .tycoon-speed{background:linear-gradient(#3e99ba,#205076)}
+.ember-play-tycoon .ember-play-mode-info{width:100%}
+@media(orientation:landscape) and (max-height:650px){
+ .ember-play-tycoon .ember-play-world{min-height:190px;height:clamp(180px,42dvh,290px)}
+ .ember-play-tycoon.ember-play-screen{gap:4px;min-height:0}
+ .ember-play-tycoon .ember-play-top{padding:3px 0}
+ .ember-play-tycoon .ember-play-footer,.ember-play-tycoon .ember-play-details{display:none}
+ .ember-play-tycoon .ember-play-controls{padding:2px 0;gap:6px}
+ .ember-play-tycoon .ember-play-use-button,.ember-play-tycoon .ember-play-auto,.ember-play-tycoon .tycoon-stop,.ember-play-tycoon .tycoon-speed{min-height:37px!important;padding:5px}
+}
