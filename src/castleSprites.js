@@ -15,6 +15,8 @@ const loader=new THREE.TextureLoader();
 const cache=new Map();
 const missing=new Set();
 const pending=new Map();
+const listeners=new Set();
+export function onCastleArtworkReady(listener){listeners.add(listener);return ()=>listeners.delete(listener)}
 function load(key){
  if(cache.has(key))return Promise.resolve(cache.get(key));
  if(missing.has(key))return Promise.resolve(null);
@@ -22,7 +24,9 @@ function load(key){
  const promise=loader.loadAsync('/art/castles/'+key+'.webp').then(texture=>{
   texture.colorSpace=THREE.SRGBColorSpace;
   texture.anisotropy=4;
-  cache.set(key,texture);pending.delete(key);return texture;
+  cache.set(key,texture);pending.delete(key);
+  for(const listener of listeners)listener(key);
+  return texture;
  }).catch(()=>{missing.add(key);pending.delete(key);return null});
  pending.set(key,promise);return promise;
 }
@@ -48,7 +52,7 @@ export function createCastleSprite(level){
  if(!texture){
   // Missing level art falls back to the existing castle model.
   load(key);
-  load(fallback);
+  if(milestone)load(fallback);
   return null;
  }
  if(!cache.has(key))load(key);
