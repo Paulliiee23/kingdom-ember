@@ -35,25 +35,38 @@ function occupied(x,z,exclude=null,type='farm'){
 }// One-time safe migration: older saves placed buildings too close to the
 // castle when it occupied only one tile. Relocate only buildings that overlap.
 function migrateCastleFootprint(){
- if(state.castleFootprintVersion>=1)return;
+ if(state.castleFootprintVersion>=2)return;
  const castle=state.buildings.find(b=>b.type==='castle');
- if(!castle){state.castleFootprintVersion=1;return}
- const offsets=[];
- for(let radius=3;radius<=6;radius++)for(let dx=-radius;dx<=radius;dx++)for(let dz=-radius;dz<=radius;dz++){
-  if(Math.max(Math.abs(dx),Math.abs(dz))===radius)offsets.push([dx,dz]);
- }
- for(const b of state.buildings){
-  if(b===castle||!plotsOverlap(b,castle))continue;
-  const oldX=b.x,oldZ=b.z;
-  for(const [dx,dz] of offsets){
-   const x=castle.x+dx,z=castle.z+dz;
-   if(x < -6||x > 6||z < -6||z > 6||occupied(x,z,b,b.type))continue;
-   b.x=x;b.z=z;
-   for(const job of state.jobs||[])if(job.x===oldX&&job.z===oldZ){job.x=x;job.z=z}
-   break;
+ if(!castle){state.castleFootprintVersion=2;return}
+ // Stage all moves first. Never overwrite an existing save with a partially
+ // relocated city if no valid destination exists for a building.
+ const staged=state.buildings.map(b=>({...b}));
+ const source=staged.find(b=>b.type==='castle');
+ const moved=[];
+ const overlaps=(a,b)=>Math.abs(a.x-b.x)<buildingHalfSize(a)+buildingHalfSize(b)&&Math.abs(a.z-b.z)<buildingHalfSize(a)+buildingHalfSize(b);
+ for(const building of staged){
+  if(building===source||!overlaps(building,source))continue;
+  let destination=null;
+  for(let radius=3;radius<=12&&!destination;radius++){
+   for(let dx=-radius;dx<=radius&&!destination;dx++)for(let dz=-radius;dz<=radius;dz++){
+    if(Math.max(Math.abs(dx),Math.abs(dz))!==radius)continue;
+    const x=source.x+dx,z=source.z+dz;
+    if(x < -6||x > 6||z < -6||z > 6)continue;
+    const candidate={...building,x,z};
+    if(staged.every(other=>other===building||!overlaps(candidate,other)))destination={x,z};
+    if(destination)break;
+   }
   }
+  if(!destination){console.warn('Castle migration postponed: no safe building destination');return}
+  moved.push({building,oldX:building.x,oldZ:building.z,...destination});
+  building.x=destination.x;building.z=destination.z;
  }
- state.castleFootprintVersion=1;
+ for(const move of moved){
+  const original=state.buildings[staged.indexOf(move.building)];
+  original.x=move.x;original.z=move.z;
+  for(const job of state.jobs||[])if(job.x===move.oldX&&job.z===move.oldZ){job.x=move.x;job.z=move.z}
+ }
+ state.castleFootprintVersion=2;
  localStorage.setItem('kingdomEmberSave',JSON.stringify(state));
 }
 migrateCastleFootprint();
