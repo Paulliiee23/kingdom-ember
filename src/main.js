@@ -1,3 +1,4 @@
+import { createRoyalCastleArtwork } from './royalCastleArtwork.js';
 import { createIsometricArtwork } from './isometricArtwork.js';
 import { loadBuildingSprite, createBuildingSprite } from './buildingSprites.js';
 import { preloadCastleSprites, createCastleSprite, onCastleArtworkReady } from './castleSprites.js';
@@ -663,8 +664,8 @@ if(b.type==='castle'){
  // New modelled castle asset replaces the old primitive fortress visual.
  // All 35 castle levels use the same isometric art priority.
  // A level-specific 2.5D sprite wins when supplied, then the GLB, then procedural art.
- const castleAsset=createCastleSprite(level)||createIsometricArtwork('castle',level,{width:3.15,height:4.0});
- if(castleAsset?.isSprite){castleAsset.scale.multiplyScalar(1.32);castleAsset.position.y*=1.32;}
+ const castleAsset=createCastleSprite(level)||createRoyalCastleArtwork(level);
+ // Dedicated castle illustration has its own designed scale and ground alignment.
  if(castleAsset){for(const child of [...g.children])g.remove(child);g.add(castleAsset)}
  else emberFortress(g,level,unified,1);
 }else if(b.type==='farm'){
