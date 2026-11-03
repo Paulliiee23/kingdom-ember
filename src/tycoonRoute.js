@@ -31,11 +31,14 @@ export function installTycoonRoute(panel,{play,onFinish}){
  function begin(repeat){
   if(active)return;
   const result=play();
-  if(!result?.ok){status.textContent=result?.reason||'No tokens available';return}
+  if(!result?.ok){status.textContent=result?.reason||'No tokens available';controls(false);return}
+  const balance=panel.querySelector('.ember-play-balance strong');
+  if(balance)balance.textContent=Math.max(0,(Number(balance.textContent.replace(/,/g,''))||0)-1).toLocaleString();
   const run={timer:null};active=run;controls(true);status.textContent='Exploring treasure path…';
   let index=0;
   function step(){
    if(active!==run)return;
+   if(!root.isConnected){stopTycoon();return}
    index++;
    if(index>=points.length){
     status.textContent=result.jackpot?'💎 Jackpot!':result.bossChests?'🎁 Bonus chest!':'🎁 Reward collected';
@@ -43,6 +46,7 @@ export function installTycoonRoute(panel,{play,onFinish}){
     if(repeat){
      run.timer=setTimeout(()=>{
       if(active!==run)return;
+      if(!root.isConnected){stopTycoon();return}
       active=null;reset();begin(true);
      },Math.round(650/multiplier));
     }else{active=null;controls(false);reset()}
