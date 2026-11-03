@@ -662,27 +662,11 @@ function refineBuildingArtwork(g,b){
 function makeBuilding(b){const g=new THREE.Group();g.position.set(b.x*2.8,0,b.z*2.8);const level=b.level;cube(g,2.45,.18,2.45,detail.mortar,0,.09,0);cube(g,2.25,.12,2.25,detail.plaster,0,.19,0);
 if(b.type==='castle'){
  const unified=Number(state.castleUnifiedLevel||state.unifiedLevel||state.castleManaLevel||state.manaLevel||0);
- // Use a dedicated castle illustration at every level; installed level art takes priority.
- const castleAsset=createCastleSprite(level)||createRoyalCastleArtwork(level);
- // Dedicated castle illustration has its own designed scale and ground alignment.
- if(castleAsset){
-  for(const child of [...g.children])g.remove(child);
-  // Keep the 2.5D illustration anchored to a real plot so it has physical
-  // presence in the city, a consistent ground shadow and a reliable tap target.
-  const foundation=new THREE.Mesh(
-   new THREE.CylinderGeometry(1.48,1.65,.22,8),
-   new THREE.MeshStandardMaterial({color:level>=29?0x8986a9:0x928c83,roughness:1})
-  );
-  foundation.position.y=.12;foundation.rotation.y=Math.PI/8;
-  foundation.receiveShadow=true;g.add(foundation);
-  const shadow=new THREE.Mesh(
-   new THREE.CircleGeometry(1.65,32),
-   new THREE.MeshBasicMaterial({color:0x151523,transparent:true,opacity:.27,depthWrite:false})
-  );
-  shadow.rotation.x=-Math.PI/2;shadow.position.y=.245;shadow.scale.set(1,.7,1);
-  g.add(shadow);
-  g.add(castleAsset);
- }else emberFortress(g,level,unified,1);
+ // Actual THREE.js castle geometry: no billboard, no printed texture.
+ // The existing fortress builder contains physical walls, four corner towers,
+ // a multi-storey keep, gatehouse, battlements, roofs and level-specific details.
+ for(const child of [...g.children])g.remove(child);
+ emberFortress(g,level,unified,1);
 }else if(b.type==='farm'){
  cube(g,1.4,.95,1.35,detail.plaster,-.2,.72,-.12);roof(g,1.65,1.65,1.57,materials.roof);cube(g,.4,.72,.12,detail.darkwood,-.2,.53,.59);windowAt(g,.3,.94,.59);
  for(let i=0;i<4;i++)for(let j=0;j<3;j++){cube(g,.07,.25,.07,detail.wheat,-1.02+i*.3,.34,.84+j*.17)}
