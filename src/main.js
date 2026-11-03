@@ -571,6 +571,62 @@ function emberFortress(parent,level,unified=0,size=1){
    cube(f,.07,.62,.065,royalTrim,x,1.12,1.24);
   }
  }
+ // Architectural detailing: real 3D geometry, viewed from every camera angle.
+ // Stone courses on all four sides break up the original flat cube surfaces.
+ const grout=new THREE.MeshStandardMaterial({color:0x6e6865,roughness:1});
+ const carved=new THREE.MeshStandardMaterial({color:0xe2d2b3,roughness:.9});
+ const ironwork=new THREE.MeshStandardMaterial({color:0x302e36,metalness:.55,roughness:.45});
+ for(const side of [-1,1]){
+  for(let row=0;row<5;row++){
+   const y=.52+row*wallH/5;
+   cube(f,2.11,.025,.015,grout,0,y,side*1.174);
+   cube(f,.015,.025,2.11,grout,side*1.174,y,0);
+   for(let column=-2;column<=2;column++){
+    const shift=(row%2)*.18;
+    cube(f,.024,wallH/5*.85,.025,grout,column*.39+shift,y+wallH/10,side*1.178);
+    cube(f,.025,wallH/5*.85,.024,grout,side*1.178,y+wallH/10,column*.39+shift);
+   }
+  }
+ }
+ // Four elevated parapet walks with visible crenellations and corner coping.
+ for(const side of [-1,1]){
+  cube(f,2.28,.12,.31,carved,0,.37+wallH,side*1.06);
+  cube(f,.31,.12,2.28,carved,side*1.06,.37+wallH,0);
+ }
+ // An inset gate arch with heavy vertical portcullis bars.
+ const gateY=.82;
+ for(let i=-2;i<=2;i++)cube(f,.045,.73,.065,ironwork,i*.115,gateY,1.36);
+ for(let y of [.57,.83,1.09])cube(f,.58,.045,.065,ironwork,0,y,1.38);
+ // The royal keep gains four stone buttresses and a projecting entry roof.
+ for(const x of [-.49,.49])for(const z of [-.51,.05]){
+  cube(f,.14,keepH*.65,.15,carved,x,.35+keepH*.325,z);
+ }
+ if(lv>=8){
+  for(const x of [-1,1])for(const z of [-1,1]){
+   // Stone corbels beneath the roofs add a readable silhouette at mobile scale.
+   for(const dx of [-.19,.19])cube(f,.15,.19,.15,carved,x+dx,.35+towerH,z);
+  }
+ }
+ if(lv>=15){
+  const bannerMat=new THREE.MeshStandardMaterial({color:lv>=29?0x603eaa:0x9b3248,side:THREE.DoubleSide,roughness:.8});
+  for(const x of [-.72,.72]){
+   cube(f,.32,.56,.035,bannerMat,x,.93,1.26);
+   cube(f,.38,.055,.07,carved,x,1.23,1.28);
+  }
+ }
+ if(lv>=22){
+  // Decorative high windows and light-catching roof ridges.
+  for(const x of [-.34,0,.34]){
+   cube(f,.16,.37,.055,glass,x,keepH*.74,large?.57:.46);
+   cube(f,.22,.07,.08,accent,x,keepH*.96,large?.6:.49);
+  }
+ }
+ if(lv>=29){
+  const crystal=new THREE.MeshStandardMaterial({color:0xa78bff,emissive:0x4e258e,emissiveIntensity:.55,roughness:.25});
+  for(const x of [-1,1])for(const z of [-1,1]){
+   cone(f,.22,.65,crystal,x,towerH+1.18,z,6);
+  }
+ }
  f.userData.castleLevel=lv;
  f.userData.unifiedLevel=unified;
  f.userData.castleStyle=stage.name;
