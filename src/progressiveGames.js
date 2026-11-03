@@ -77,13 +77,18 @@ export function progressivePanel(state,game){
     <div class="ember-play-destination">${lab?'🐉':'💠'}</div>
     <div class="ember-play-avatar">${lab?'⚔️':'👑'}</div>
     <div class="ember-play-treasure">🧰<span>💎</span></div>
-    <div class="ember-play-stage" data-ember-stage="${game}" aria-label="${game} animated stage"></div>
+    ${lab?'<div class="ember-play-stage" data-ember-stage="labyrinth" aria-label="labyrinth animated stage"></div>':`<div class="tycoon-route" data-tycoon-route>
+     <svg class="tycoon-route-lines" viewBox="0 0 900 350" preserveAspectRatio="none" aria-hidden="true"><path d="M80 245 C180 245 155 100 275 112 S395 255 480 220 S585 65 665 115 S755 260 855 135" fill="none" stroke="#5b9ed8" stroke-width="18" stroke-linecap="round"/><path d="M80 245 C180 245 155 100 275 112 S395 255 480 220 S585 65 665 115 S755 260 855 135" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg>
+     <span class="tycoon-tile" style="--x:9%;--y:70%">🎁</span><span class="tycoon-tile" style="--x:30%;--y:32%">💰</span><span class="tycoon-tile" style="--x:53%;--y:63%">💎</span><span class="tycoon-tile" style="--x:74%;--y:33%">🎯</span><span class="tycoon-tile" style="--x:95%;--y:39%">👑</span>
+     <span class="tycoon-runner" data-tycoon-runner>🦸</span>
+     <div class="tycoon-run-status" data-tycoon-status>Ready to explore</div>
+    </div>`}
    </div>
    <div class="ember-play-jackpot"><span>💎 PROGRESSIVE JACKPOT</span><strong data-jackpot-value>${n(p.pools[game+':normal'].value)}</strong></div>
   </div>
   <div class="ember-play-controls">
    <div class="ember-play-mode-picker" role="group" aria-label="Play mode"><button type="button" data-ember-select-mode="normal" class="is-active" aria-pressed="true">Normal</button><button type="button" data-ember-select-mode="elite" aria-pressed="false" ${!p.eliteUnlocked?'disabled':''}>Elite ${p.eliteUnlocked?'':'🔒'}</button></div>
-   <div class="ember-play-use"><div class="ember-play-mode-info" data-ember-mode-info>Normal · 1 ${lab?'star':'token'} per use</div><button type="button" class="ember-play-use-button" data-progressive-mode="normal" ${count<1?'disabled':''}>USE <span><img src="${icon}" alt=""> 1</span></button><button type="button" class="ember-play-auto" data-ember-auto>Auto Use ×3</button></div>
+   <div class="ember-play-use"><div class="ember-play-mode-info" data-ember-mode-info>Normal · 1 ${lab?'star':'token'} per use</div><button type="button" class="ember-play-use-button" data-progressive-mode="normal" ${count<1?'disabled':''}>${lab?'USE':'START'} <span><img src="${icon}" alt=""> 1</span></button><button type="button" class="ember-play-auto" data-ember-auto>${lab?'Auto Use ×3':'AUTO START'}</button>${lab?'':'<button type="button" class="tycoon-stop" data-tycoon-stop disabled>STOP</button><button type="button" class="tycoon-speed" data-tycoon-speed>×1 SPEED</button>'}</div>
   </div>
   <div class="ember-play-footer"><span>${lab?'Explore the ruins and defeat the boss':'Advance along the treasure path'}</span><span>Offline playtest · no purchases</span></div>
   ${!p.eliteUnlocked?'<button type="button" id="testEliteUnlock" class="ember-play-unlock">Unlock Elite (free testing)</button>':''}
