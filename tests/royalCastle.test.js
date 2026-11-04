@@ -13,9 +13,11 @@ test('royal castle has all six architectural tiers through level 35',()=>{
  assert.match(castle,/export function createRoyalCastleArtwork\(level\)/);
  assert.match(castle,/clampLevel\(level\)/);
 });
-test('castle uses dedicated 2.5D illustration instead of generic building art',()=>{
- assert.match(main,/createCastleSprite\(level\)\|\|createRoyalCastleArtwork\(level\)/);
- assert.match(main,/foundation\.receiveShadow=true/);
+test('castle uses level-specific GLB meshes with procedural fallback',()=>{
+ const loader=readFileSync(new URL('../src/castleGLBLoader.js',import.meta.url),'utf8');
+ for(const name of ['castle-1-8.glb','castle-9-16.glb','castle-17-24.glb','castle-25-30.glb'])assert.ok(loader.includes(name));
+ assert.match(main,/loadTierCastle\(level\)/);
+ assert.match(main,/emberFortress\(g,level,unified,3\.45\)/);
  assert.match(main,/g\.userData\.building=b/);
 });
 test('castle art is positioned at ground level with no stretched imported sprite',()=>{
