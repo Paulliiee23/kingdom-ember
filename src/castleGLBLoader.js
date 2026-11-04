@@ -69,7 +69,23 @@ export async function loadTierCastle(level){
  const file=tierFiles[lv>=25?3:lv>=17?2:lv>=9?1:0];
  if(!tierCache.has(file))tierCache.set(file,loader.loadAsync('/models/'+file).then(gltf=>gltf.scene).catch(error=>{tierCache.delete(file);throw error;}));
  const model=(await tierCache.get(file)).clone(true);
- model.traverse(obj=>{if(obj.isMesh){obj.castShadow=true;obj.receiveShadow=true;}});
+ model.traverse(obj=>{
+  if(!obj.isMesh)return;
+  obj.castShadow=true;obj.receiveShadow=true;
+  const brighten=material=>{
+   const copy=material.clone();
+   if(copy.color){
+    // Exported castle textures are very dark: lift diffuse values without
+    // replacing textures or flattening the model's original material details.
+    const c=copy.color;
+    c.setRGB(Math.min(1,c.r*.72+.34),Math.min(1,c.g*.72+.34),Math.min(1,c.b*.72+.34));
+   }
+   if('metalness' in copy)copy.metalness=Math.min(.22,copy.metalness);
+   if('roughness' in copy)copy.roughness=Math.max(.62,copy.roughness);
+   return copy;
+  };
+  obj.material=Array.isArray(obj.material)?obj.material.map(brighten):brighten(obj.material);
+ });
  const bounds=new THREE.Box3().setFromObject(model);
  const size=bounds.getSize(new THREE.Vector3());
  if(!size.x||!size.y||!size.z)throw new Error('Empty castle model: '+file);
