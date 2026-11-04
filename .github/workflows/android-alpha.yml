@@ -1,15 +1,6 @@
 name: Android Alpha APK
 on:
   workflow_dispatch:
-  push:
-    branches: [feature/royal-ui-v095]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'capacitor.config.json'
-      - '.github/workflows/android-alpha.yml'
 jobs:
   android:
     runs-on: ubuntu-latest
