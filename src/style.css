@@ -376,3 +376,26 @@ body>button[title="Local single-player test tools"]{position:fixed!important;top
  .ember-play-tycoon .ember-play-controls{padding:2px 0;gap:6px}
  .ember-play-tycoon .ember-play-use-button,.ember-play-tycoon .ember-play-auto,.ember-play-tycoon .tycoon-stop,.ember-play-tycoon .tycoon-speed{min-height:37px!important;padding:5px}
 }
+
+
+/* Kingdom Ember official illustrated loading screen.
+   Keep the real progress elements and Enter Kingdom control accessible. */
+#titleScreen{
+ background:#100c1e url('/kingdom-ember-loading.png') center center / cover no-repeat !important;
+ padding:0 !important;
+}
+#titleScreen > div{
+ position:absolute;left:50%;bottom:max(2%,env(safe-area-inset-bottom));transform:translateX(-50%);
+ width:min(92vw,500px);padding:10px 14px !important;
+ background:rgba(15,8,30,.80) !important;
+ border:1px solid rgba(236,185,102,.7) !important;
+ border-radius:12px !important;
+ box-shadow:0 8px 30px #080414aa !important;
+}
+#titleScreen .ember-title-crest,
+#titleScreen h1,
+#titleScreen > div > p,
+#titleScreen > div > div[style*="letter-spacing"]{display:none !important;}
+#titleScreen #play{margin:0 !important;padding:9px 24px !important;font-size:16px !important;}
+#titleScreen #loadStatus{margin-top:6px !important;font-size:12px !important;}
+#titleScreen #loadTrack{height:10px !important;margin:5px auto !important;width:min(380px,80vw) !important;}
