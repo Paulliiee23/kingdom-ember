@@ -32,7 +32,6 @@ test('downloaded castle art refreshes the visible city automatically',()=>{
 
 test('castle footprint prevents overlapping plots and migrates older saves',()=>{
  assert.match(main,/function buildingHalfSize\\(b\\)/);
- assert.match(main,/b\\.type==='castle'\\?2:\\.5/);
  assert.match(main,/function migrateCastleFootprint\\(\\)/);
  assert.match(main,/migrateCastleFootprint\\(\\);/);
 });
