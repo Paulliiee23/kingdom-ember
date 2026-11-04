@@ -62,4 +62,22 @@ export function createCastleGLBInstance(level=1){
  castle.userData.level=level;
  return castle;
 }
+const tierFiles=['castle-1-8.glb','castle-9-16.glb','castle-17-24.glb','castle-25-30.glb'];
+const tierCache=new Map();
+export async function loadTierCastle(level){
+ const lv=Math.max(1,Number(level)||1);
+ const file=tierFiles[lv>=25?3:lv>=17?2:lv>=9?1:0];
+ if(!tierCache.has(file))tierCache.set(file,loader.loadAsync('/models/'+file).then(gltf=>gltf.scene).catch(error=>{tierCache.delete(file);throw error;}));
+ const model=(await tierCache.get(file)).clone(true);
+ model.traverse(obj=>{if(obj.isMesh){obj.castShadow=true;obj.receiveShadow=true;}});
+ const bounds=new THREE.Box3().setFromObject(model);
+ const size=bounds.getSize(new THREE.Vector3());
+ if(!size.x||!size.y||!size.z)throw new Error('Empty castle model: '+file);
+ model.scale.multiplyScalar(Math.min(3.4/size.x,3.4/size.z,5.5/size.y));
+ const fitted=new THREE.Box3().setFromObject(model);
+ const center=fitted.getCenter(new THREE.Vector3());
+ model.position.set(-center.x,.02-fitted.min.y,-center.z);
+ model.userData.assetType=file;
+ return model;
+}
 export function royalCastleGLBReady(){return Boolean(source);}
