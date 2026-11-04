@@ -6,6 +6,7 @@ import { preloadCastleSprites, createCastleSprite, onCastleArtworkReady } from '
 import { installAndroidUpdater } from './androidUpdater.js';
 import { observeFantasyStages } from './fantasyStages.js';
 import { preloadRoyalCastle, createCastleGLBInstance, loadTierCastle } from './castleGLBLoader.js';
+import { loadActivityModel } from './activityGLBLoader.js';
 import * as THREE from 'three';import './style.css';import { installOwnerPanel } from './ownerPanel.js';
 import {renderCommunityEvents,bindCommunityEvents} from './communityEvents.js';
 import {renderHeroRoster,bindHeroRoster} from './heroRoster.js';
@@ -793,7 +794,7 @@ if(b.type!=='castle')cube(g,1.95,.045,.08,detail.trim,0,.25,1.16);if(b.type!=='c
   for(const child of [...g.children])g.remove(child);
   g.add(art);
  }else{architectureDetail(g,b);emberDetails(g,b);royalBuildingDetail(g,b);refineBuildingArtwork(g,b)}
-}g.userData.building=b;scene.add(g);objects.push(g);if(b.type==='castle'){loadTierCastle(level).then(model=>{if(g.parent!==scene||g.userData.building!==b||b.level!==level)return;for(const child of [...g.children])g.remove(child);g.add(model);g.userData.castleAsset=model.userData.assetType;}).catch(error=>console.warn('Using procedural castle fallback:',error));}}
+}g.userData.building=b;scene.add(g);objects.push(g);if(b.type==='tycoon'||b.type==='labyrinth'){loadActivityModel(b.type).then(model=>{if(g.parent!==scene||g.userData.building!==b)return;for(const child of [...g.children])g.remove(child);g.add(model);g.userData.activityAsset=b.type;}).catch(error=>console.warn('Using fallback building for '+b.type,error));}if(b.type==='castle'){loadTierCastle(level).then(model=>{if(g.parent!==scene||g.userData.building!==b||b.level!==level)return;for(const child of [...g.children])g.remove(child);g.add(model);g.userData.castleAsset=model.userData.assetType;}).catch(error=>console.warn('Using procedural castle fallback:',error));}}
 // Replace procedural castle art with the downloaded level-specific illustration
 // as soon as it is available, without requiring a restart or another upgrade.
 onCastleArtworkReady(()=>{
