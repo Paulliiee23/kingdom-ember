@@ -1,8 +1,5 @@
 name: Kingdom Ember Android Debug APK
 on:
-  push:
-    branches:
-      - feature/royal-ui-v095
   workflow_dispatch:
 jobs:
   android-debug:
